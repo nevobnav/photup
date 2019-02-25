@@ -11,8 +11,8 @@ import logging
 import configparser
 
 #### DEBUG SETTINGS
-backup= False
-format= False
+backup= True
+format= True
 ####################
 
 syslog.syslog('Python scrip started')
