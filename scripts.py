@@ -126,13 +126,13 @@ def create_drive_obj():
     drive = GoogleDrive(gauth)
     return drive
 
-def get_filelist(drive,id):
+def get_filelist(drive, id):
     query = "'" + id + "' in parents and trashed=false"
     file_list = drive.ListFile({'q': query}).GetList()
     return file_list
 
-def find_or_create_folder(drive,title,id):
-    filelist = get_filelist(id)
+def find_or_create_folder(drive, title, id):
+    filelist = get_filelist(drive, id)
     new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
     if not(new_folder):
         print('Creating new folder "{}"'.format(title))
@@ -140,7 +140,7 @@ def find_or_create_folder(drive,title,id):
         folder_location_metadata = {"parents": [{"kind": "drive#fileLink", "id": id}]}
         folder = drive.CreateFile({**folder_metadata, **folder_location_metadata})
         folder.Upload()
-    filelist = get_filelist(id)
+    filelist = get_filelist(drive, id)
     new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
     new_id = new_folder['id']
     return new_id
