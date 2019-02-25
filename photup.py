@@ -92,6 +92,7 @@ try:
             #    flickr = authorize_flickr(flickr)
             #create drive object
             drive = create_drive_obj()
+            drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
             #Upload files onto Flickr
             for fname in files:
                 try:
@@ -111,7 +112,7 @@ try:
                         f.write("Connection live \n")
                         # timestamp_string = get_now()
                         # photo_tags = timestamp_string[0:10] + ' ' + client_id
-                        resp = upload_to_gdrive(drive, fname, client_id, scan_id)
+                        resp = upload_to_gdrive(drive, fname, drive_filenames, client_id, drive_folder_scan_id)
                         # resp = flickr.upload(filename=fname,tags=photo_tags,description = timestamp_string, is_public=0)
                         if resp is True:
                             log_msg +='Upload succeeded'+'\n'

@@ -145,30 +145,34 @@ def find_or_create_folder(drive, title, id):
     new_id = new_folder['id']
     return new_id
 
-def upload_to_gdrive(drive, filename, client_id, scan_id):
+def prepare_new_scan(drive,client_id,scan_id):
     folder_Opnames_id = '1DTK46R2aG0cWnN698OGSxGY2dIlJ-LEN'
     folder_customer_id = find_or_create_folder(drive,client_id,folder_Opnames_id)
     folder_scan_id = find_or_create_folder(drive,scan_id, folder_customer_id)
     img_title =  os.path.basename(filename)
     scanfolder_files = get_filelist(drive,folder_scan_id)
     filenames = [file['title'] for file in scanfolder_files]
+    return filenames, folder_scan_id
+
+def upload_to_gdrive(drive, fname, drive_filenames, client_id, drive_folder_scan_id,):
+    img_title =  os.path.basename(fname)
     no_tries = 0
-    while not(img_title in filenames) and no_tries <10:
+    while not(img_title in drive_filenames) and no_tries <10:
         print("{} not in current fileset".format(img_title))
         newimg = drive.CreateFile({
             'title':img_title,
             "parents": [{
                 "kind": "drive#childList",
-                "id": folder_scan_id
+                "id": drive_folder_scan_id
                 }]
             })
-        newimg.SetContentFile(filename)
+        newimg.SetContentFile(fname)
         try:
             newimg.Upload()
         except:
             pass
-        scanfolder_files = get_filelist(drive,folder_scan_id)
-        filenames = [file['title'] for file in scanfolder_files]
+        scanfolder_files = get_filelist(drive,drive_folder_scan_id)
+        drive_filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
     if img_title in filenames:
         if no_tries == 0:
