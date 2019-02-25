@@ -153,7 +153,7 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
     path_img = ['']
     filenames = []
     no_tries = 0
-    while not(img in filenames) and no_tries <10:
+    while not(img_title in filenames) and no_tries <10:
         newimg = drive.CreateFile({
             'title':img_title,
             "parents": [{
@@ -169,7 +169,7 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
         scanfolder_files = get_filelist(folder_scan_id)
         filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
-    if im in filenames:
+    if image_title in filenames:
         return True
     else:
         return False
