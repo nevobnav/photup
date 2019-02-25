@@ -243,5 +243,5 @@ def get_filenames(sdcard,extensions):
     for root, dirs, files in os.walk(sdcard, topdown=False):
         for file in files:
             if file.endswith(tuple(extensions)) and not file.startswith("._") and root.find('Trash') == -1:
-                filelist.extend([root+'/'+file])
+                filelist.extend([root+file])
     return filelist
