@@ -169,7 +169,7 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
         scanfolder_files = get_filelist(drive,folder_scan_id)
         filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
-    if image_title in filenames:
+    if img_title in filenames:
         return True
     else:
         return False
