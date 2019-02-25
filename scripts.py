@@ -26,7 +26,7 @@ def perform_backup(files):
     # If no space is available still, the files are not backed up.
     total_file_size = 0 #Used to determine total file size of all images combined
     output = ''
-    backup_folder_location = '/home/pi/image_backup/'
+    backup_folder_location = '/usr/bin/photup/image_backup/'
     datestring = datetime.datetime.now().strftime("%Y%m%d")
     backup_folder = backup_folder_location+datestring+'/'
 
@@ -110,7 +110,7 @@ def get_now():
 def create_drive_obj():
     gauth = GoogleAuth()
     # Try to load saved client credentials
-    gauth.LoadCredentialsFile("gdrive_creds.txt")
+    gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
     if gauth.credentials is None:
         # Authenticate if they're not there
         gauth.LocalWebserverAuth()
@@ -121,7 +121,7 @@ def create_drive_obj():
         # Initialize the saved creds
         gauth.Authorize()
     # Save the current credentials to a file
-    gauth.SaveCredentialsFile("gdrive_creds.txt")
+    gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
 
     drive = GoogleDrive(gauth)
     return drive
