@@ -150,8 +150,8 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
     folder_customer_id = find_or_create_folder(drive,client_id,folder_Opnames_id)
     folder_scan_id = find_or_create_folder(drive,scan_id, folder_customer_id)
     img_title =  os.path.basename(filename)
-    path_img = ['']
-    filenames = []
+    scanfolder_files = get_filelist(drive,folder_scan_id)
+    filenames = [file['title'] for file in scanfolder_files]
     no_tries = 0
     while not(img_title in filenames) and no_tries <10:
         newimg = drive.CreateFile({
