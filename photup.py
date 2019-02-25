@@ -9,6 +9,12 @@ import datetime
 import time
 import logging
 import configparser
+
+#### DEBUG SETTINGS
+backup=False
+
+####################
+
 syslog.syslog('Python scrip started')
 logging.basicConfig(filename = '/usr/bin/photup/logdetails.log', level=logging.DEBUG)
 log_msg = 'New image processing order: \n'
@@ -51,7 +57,7 @@ f.write(log_msg)
 files = get_filenames(sdcard,extensions)
 imgs = len(files)>0
 
-if imgs:
+if imgs and backup:
     try:
         output = perform_backup(files)
     except:
