@@ -16,6 +16,9 @@ import datetime
 from shutil import copy2
 from LED import *
 import requests
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+
 
 def perform_backup(files):
     #This function backups up files from SD if space allows. If not it
@@ -104,6 +107,76 @@ def get_now():
     timestamp_string = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     return timestamp_string
 
+def create_drive_obj():
+    gauth = GoogleAuth()
+    # Try to load saved client credentials
+    gauth.LoadCredentialsFile("gdrive_creds.txt")
+    if gauth.credentials is None:
+        # Authenticate if they're not there
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        # Refresh them if expired
+        gauth.Refresh()
+    else:
+        # Initialize the saved creds
+        gauth.Authorize()
+    # Save the current credentials to a file
+    gauth.SaveCredentialsFile("gdrive_creds.txt")
+
+    drive = GoogleDrive(gauth)
+
+def get_filelist(id):
+    query = "'" + id + "' in parents and trashed=false"
+    file_list = drive.ListFile({'q': query}).GetList()
+    return file_list
+
+def find_or_create_folder(title,id):
+    filelist = get_filelist(id)
+    new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
+    if not(new_folder):
+        print('Creating new folder "{}"'.format(title))
+        folder_metadata = {'title' : title, 'mimeType' : 'application/vnd.google-apps.folder'}
+        folder_location_metadata = {"parents": [{"kind": "drive#fileLink", "id": id}]}
+        folder = drive.CreateFile({**folder_metadata, **folder_location_metadata})
+        folder.Upload()
+    filelist = get_filelist(id)
+    new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
+    new_id = new_folder['id']
+    return new_id
+
+def upload_to_gdrive(drive, filename, client_id, scan_id):
+    folder_Opnames_id = '1DTK46R2aG0cWnN698OGSxGY2dIlJ-LEN'
+    folder_customer_id = find_or_create_folder(client_id,folder_Opnames_id)
+    folder_scan_id = find_or_create_folder(scan_id, folder_customer_id)
+    img_title =  os.path.basename(filename)
+    path_img = ['']
+    filenames = []
+    no_tries = 0
+    while not(img in filenames) and no_tries <10:
+        newimg = drive.CreateFile({
+            'title':img_title,
+            "parents": [{
+                "kind": "drive#childList",
+                "id": folder_scan_id
+                }]
+            })
+        newimg.SetContentFile(filename)
+        try:
+            newimg.Upload()
+        except:
+            pass
+        scanfolder_files = get_filelist(folder_scan_id)
+        filenames = [file['title'] for file in scanfolder_files]
+        no_tries += 1
+    if im in filenames:
+        return True
+    else:
+        return False
+
+
+
+
+
 def create_flickr_obj():
     config_file = "/etc/flickr.conf"
     config = configparser.ConfigParser()
@@ -167,5 +240,3 @@ def get_filenames(sdcard,extensions):
             if file.endswith(tuple(extensions)) and not file.startswith("._") and root.find('Trash') == -1:
                 filelist.extend([root+'/'+file])
     return filelist
-
-
