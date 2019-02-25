@@ -124,6 +124,7 @@ def create_drive_obj():
     gauth.SaveCredentialsFile("gdrive_creds.txt")
 
     drive = GoogleDrive(gauth)
+    return drive
 
 def get_filelist(id):
     query = "'" + id + "' in parents and trashed=false"
@@ -172,9 +173,6 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
         return True
     else:
         return False
-
-
-
 
 
 def create_flickr_obj():

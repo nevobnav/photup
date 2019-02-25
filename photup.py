@@ -89,7 +89,8 @@ try:
             #flickr = create_flickr_obj()
             #if not flickr.token_valid(perms='write'):
             #    flickr = authorize_flickr(flickr)
-
+            #create drive object
+            drive = create_drive_obj()
             #Upload files onto Flickr
             for fname in files:
                 try:
