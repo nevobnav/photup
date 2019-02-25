@@ -154,6 +154,7 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
     filenames = [file['title'] for file in scanfolder_files]
     no_tries = 0
     while not(img_title in filenames) and no_tries <10:
+        print("{} not in current fileset".format(img_title))
         newimg = drive.CreateFile({
             'title':img_title,
             "parents": [{
@@ -171,7 +172,7 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
         no_tries += 1
     if img_title in filenames:
         if no_tries == 0:
-            print('{} already in drive'.format(img_title))
+            print("{} already in drive".format(img_title))
         return True
     else:
         return False
