@@ -126,12 +126,12 @@ def create_drive_obj():
     drive = GoogleDrive(gauth)
     return drive
 
-def get_filelist(id):
+def get_filelist(drive,id):
     query = "'" + id + "' in parents and trashed=false"
     file_list = drive.ListFile({'q': query}).GetList()
     return file_list
 
-def find_or_create_folder(title,id):
+def find_or_create_folder(drive,title,id):
     filelist = get_filelist(id)
     new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
     if not(new_folder):
@@ -147,8 +147,8 @@ def find_or_create_folder(title,id):
 
 def upload_to_gdrive(drive, filename, client_id, scan_id):
     folder_Opnames_id = '1DTK46R2aG0cWnN698OGSxGY2dIlJ-LEN'
-    folder_customer_id = find_or_create_folder(client_id,folder_Opnames_id)
-    folder_scan_id = find_or_create_folder(scan_id, folder_customer_id)
+    folder_customer_id = find_or_create_folder(drive,client_id,folder_Opnames_id)
+    folder_scan_id = find_or_create_folder(drive,scan_id, folder_customer_id)
     img_title =  os.path.basename(filename)
     path_img = ['']
     filenames = []
@@ -166,7 +166,7 @@ def upload_to_gdrive(drive, filename, client_id, scan_id):
             newimg.Upload()
         except:
             pass
-        scanfolder_files = get_filelist(folder_scan_id)
+        scanfolder_files = get_filelist(drive,folder_scan_id)
         filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
     if image_title in filenames:
