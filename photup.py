@@ -39,6 +39,7 @@ extensions = settings.get('basic_settings','extensions').splitlines()	#Only thes
 version= '0.1'
 syslog.syslog('loaded all settings')
 
+##
 #initiate log file
 now = get_now()
 log_msg += 'Time: ' +now+'\n'
@@ -110,7 +111,7 @@ try:
                         f.write("Connection live \n")
                         # timestamp_string = get_now()
                         # photo_tags = timestamp_string[0:10] + ' ' + client_id
-                        resp = upload_to_gdrive(drive, filename, client_id, scan_id)
+                        resp = upload_to_gdrive(drive, fname, client_id, scan_id)
                         # resp = flickr.upload(filename=fname,tags=photo_tags,description = timestamp_string, is_public=0)
                         if resp is True:
                             log_msg +='Upload succeeded'+'\n'
