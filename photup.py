@@ -11,8 +11,8 @@ import logging
 import configparser
 
 #### DEBUG SETTINGS
-backup=False
-
+backup= False
+format= False
 ####################
 
 syslog.syslog('Python scrip started')
@@ -170,7 +170,7 @@ try:
             log_msg += logging_conn_issue +'\n'
 
     #Close down session
-    cleanexit(imgs,devname,led_thread,formatting = True, succes = True)
+    cleanexit(imgs,devname,led_thread,formatting = format, succes = True)
 
     #Send alert:
     conn = False
