@@ -173,7 +173,7 @@ def upload_to_gdrive(drive, fname, drive_filenames, client_id, drive_folder_scan
         scanfolder_files = get_filelist(drive,drive_folder_scan_id)
         drive_filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
-    if img_title in filenames:
+    if img_title in drive_filenames:
         if no_tries == 0:
             print("{} already in drive".format(img_title))
         return True
