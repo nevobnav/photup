@@ -149,7 +149,6 @@ def prepare_new_scan(drive,client_id,scan_id):
     folder_Opnames_id = '1DTK46R2aG0cWnN698OGSxGY2dIlJ-LEN'
     folder_customer_id = find_or_create_folder(drive,client_id,folder_Opnames_id)
     folder_scan_id = find_or_create_folder(drive,scan_id, folder_customer_id)
-    img_title =  os.path.basename(filename)
     scanfolder_files = get_filelist(drive,folder_scan_id)
     filenames = [file['title'] for file in scanfolder_files]
     return filenames, folder_scan_id
