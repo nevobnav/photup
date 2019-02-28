@@ -99,8 +99,8 @@ try:
             #create drive object
             drive = create_drive_obj()
             drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
-            log_msg += "Currently in drive folder: " +drive_filenames +'\n'
-            f.write("Currently in drive folder: " +drive_filenames +'\n')
+            log_msg += "Currently in drive folder: " + str(drive_filenames) +'\n'
+            f.write("Currently in drive folder: " +str(drive_filenames) +'\n')
             #Upload files onto Flickr
             for fname in files:
                 try:
