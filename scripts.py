@@ -225,7 +225,7 @@ def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
         #Format memory sdcard
         if formatting:
             print("Formatting SD...")
-            call(["sudo","mkfs.vfat","-n","DJI_IMGS",devname])
+            call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
     if succes:
         stop_led(led_thread)
         led_succes()
