@@ -82,7 +82,7 @@ def perform_backup(files):
         output += 'Disk full - No images copied!'+'\n'
         send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
 
-    return output
+    return output,total_file_size
 
 def get_device_name():
     df = str(check_output("df"))
@@ -180,6 +180,32 @@ def upload_to_gdrive(drive, fname, client_id, drive_folder_scan_id,):
         return True
     else:
         return False
+
+def create_init_file(files,scan_id):
+    init_file_name = "usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_init.txt"
+    basenames = []
+    for file in files:
+        basename = os.path.basename(file)
+        basenames.extend([basename])
+    with open(init_file_name,'w') as f:
+        f.write( ','.join(files))
+    return init_file_name
+
+def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id):
+    exit_file_name = "usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_exit.txt"
+    duration_min = round(duration/60)
+    avg_duration = round(duration/no_of_imgs)
+    total_file_size = round(total_file_size/1e6)
+    avg_file_size = round(total_file_size/no_of_imgs)
+    with open(exit_file_name,'w') as f:
+        f.write('Succesfull uploads: {} of {}.'.format(successful_uploads,no_of_imgs))
+        f.write('Finished in {} minutes at an average of {}s per image.'.format(duration_min,avg_duration))
+        f.write('Total uploaded file size equals {}MB at an average of {} per image.'.format(total_file_size, avg_file_size))
+        f.write('Error log:')
+        f.write(log_msg)
+
+    return exit_file_name
+
 
 
 def create_flickr_obj():

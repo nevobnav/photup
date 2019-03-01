@@ -56,12 +56,18 @@ f.write(log_msg)
 #Get files from disc
 files = get_filenames(sdcard,extensions)
 imgs = len(files)>0
+no_of_imgs = len(files)
+
+
+#Create init and exit txt files with the full list of images (basename only)
+init_file_name = create_init_file(files,scan_id,client_id)
+
 
 if imgs and backup:
     try:
-        output = perform_backup(files)
+        output, total_file_size = perform_backup(files)
     except:
-        output = "perform_backup failed. Please check!"
+        output, total_file_size = "perform_backup failed. Please check!"
         send_telegram('client {}: perform_backup failed. Please check'.format(client_id),telegram_ids)
     log_msg += output +'\n'
     f.write(output + '\n')
@@ -90,6 +96,7 @@ try:
         log_msg += log_addition
         syslog.syslog(log_addition)
         if conn:
+            start_time = time.time()
             message_text = "{0}: pictures incoming!".format(client_id)
             send_telegram(message_text,telegram_ids)
             #Create flickr opject
@@ -99,9 +106,11 @@ try:
             #create drive object
             drive = create_drive_obj()
             drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
+            #Upload initiation file
+            resp = upload_to_gdrive(drive, init_file_name, client_id, drive_folder_scan_id)
             log_msg += "Currently in drive folder: " + str(drive_filenames) +'\n'
             f.write("Currently in drive folder: " +str(drive_filenames) +'\n')
-            #Upload files onto Flickr
+            #Upload files onto Gdrive
             for fname in files:
                 try:
                     stop_led(led_thread)
@@ -118,10 +127,7 @@ try:
                         print('Connection live')
                         log_msg +='Connection live' +'\n'
                         f.write("Connection live \n")
-                        # timestamp_string = get_now()
-                        # photo_tags = timestamp_string[0:10] + ' ' + client_id
                         resp = upload_to_gdrive(drive, fname, client_id, drive_folder_scan_id)
-                        # resp = flickr.upload(filename=fname,tags=photo_tags,description = timestamp_string, is_public=0)
                         if resp is True:
                             log_msg +='Upload succeeded'+'\n'
                             successful_uploads += 1
@@ -154,6 +160,11 @@ try:
                     led_error = True
                     log_msg += 'Script failed unknown at file: ' + str(fname) +'\n'
                     f.write('Script failed unknown at file: ' + str(fname) +'\n')
+            #Upload exit file here.
+            end = time.time()
+            duration = (end-start)
+            exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id)
+            resp = upload_to_gdrive(drive, exit_file_name, client_id, drive_folder_scan_id)
         else:
             stop_led(led_thread)
             led_blink = False
