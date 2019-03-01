@@ -120,7 +120,7 @@ try:
 
                     print('Uploading file: ',fname)
                     log_msg +='Uploading file: '+str(fname) +'\n'
-                    f.write("Uploading file: "+str(fname) +'\n'")
+                    f.write("Uploading file: "+str(fname) +'\n')
                     syslog.syslog(log_msg[0:-3])
                     conn_intermediate = test_internet()
                     if conn_intermediate:
