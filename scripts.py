@@ -181,7 +181,7 @@ def upload_to_gdrive(drive, fname, client_id, drive_folder_scan_id,):
     else:
         return False
 
-def create_init_file(files,scan_id):
+def create_init_file(files,scan_id,client_id):
     init_file_name = "usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_init.txt"
     basenames = []
     for file in files:
