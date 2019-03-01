@@ -182,7 +182,7 @@ def upload_to_gdrive(drive, fname, client_id, drive_folder_scan_id,):
         return False
 
 def create_init_file(files,scan_id,client_id):
-    init_file_name = "usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_init.txt"
+    init_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_init.txt"
     basenames = []
     for file in files:
         basename = os.path.basename(file)
@@ -192,7 +192,7 @@ def create_init_file(files,scan_id,client_id):
     return init_file_name
 
 def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id):
-    exit_file_name = "usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_exit.txt"
+    exit_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_exit.txt"
     duration_min = round(duration/60)
     avg_duration = round(duration/no_of_imgs)
     total_file_size = round(total_file_size/1e6)
