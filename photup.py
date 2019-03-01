@@ -120,7 +120,7 @@ try:
 
                     print('Uploading file: ',fname)
                     log_msg +='Uploading file: '+str(fname) +'\n'
-                    f.write("Uploading file: '+str(fname) +'\n'")
+                    f.write("Uploading file: "+str(fname) +'\n'")
                     syslog.syslog(log_msg[0:-3])
                     conn_intermediate = test_internet()
                     if conn_intermediate:
@@ -161,8 +161,8 @@ try:
                     log_msg += 'Script failed unknown at file: ' + str(fname) +'\n'
                     f.write('Script failed unknown at file: ' + str(fname) +'\n')
             #Upload exit file here.
-            end = time.time()
-            duration = (end-start)
+            end_time = time.time()
+            duration = (end_time-start_time)
             exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id)
             resp = upload_to_gdrive(drive, exit_file_name, client_id, drive_folder_scan_id)
         else:
