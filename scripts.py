@@ -188,7 +188,7 @@ def create_init_file(files,scan_id,client_id):
         basename = os.path.basename(file)
         basenames.extend([basename])
     with open(init_file_name,'w') as f:
-        f.write( ','.join(basenames)
+        f.write( ','.join(basenames))
     return init_file_name
 
 def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id):
