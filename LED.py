@@ -3,7 +3,7 @@ import time
 import threading
 import RPi.GPIO as GPIO
 
-def led_on(LEDpin = 4):
+def led_on(LEDpin = 27):
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(LEDpin,GPIO.OUT)
@@ -27,7 +27,7 @@ def stop_led(t):
     return
 
 def led_blink(interval = 0.5):
-    LEDpin = 4
+    LEDpin = 27
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(LEDpin,GPIO.OUT)
@@ -41,7 +41,7 @@ def led_blink(interval = 0.5):
     led_off()
     return
 
-def led_off(LEDpin = 4):
+def led_off(LEDpin = 27):
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(LEDpin,GPIO.OUT)
@@ -50,7 +50,7 @@ def led_off(LEDpin = 4):
     return
 
 def led_error(interval = 0.5):
-    LEDpin = 4
+    LEDpin = 27
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(LEDpin,GPIO.OUT)
@@ -75,7 +75,7 @@ def led_error(interval = 0.5):
     print('Error blink')
     return
 
-def led_succes(LEDpin = 4):
+def led_succes(LEDpin = 27):
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(LEDpin,GPIO.OUT)

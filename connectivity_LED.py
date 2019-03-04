@@ -23,15 +23,15 @@ def loop_score(no_of_loop,sleep_time,breakout=True):
         logger.error('we live equals:'+str(we_live))
         if we_live:
             score+=1
-            led_on(LEDpin=27)
+            led_on(LEDpin=4)
             sleep(sleep_time)
         else:
             if breakout:
                 score = 100         #Set score to 100 to breakout and go to smaller loop
-                led_off(LEDpin=27)
+                led_off(LEDpin=4)
             else:
                 score = 0           #Set score to 0 to keep looping
-                led_off(LEDpin=27)
+                led_off(LEDpin=4)
                 sleep(sleep_time)
     outcome = (score == no_of_loop+1) #True if loop was succesfull, false if breakout
     return outcome
@@ -65,7 +65,7 @@ def conn_LED():
 
 
 if __name__ == '__main__':
-    led_off(LEDpin=27)
+    led_off(LEDpin=4)
     p = Process(target=conn_LED)
     p.daemon=True
     p.start()
