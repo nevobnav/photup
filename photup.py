@@ -158,7 +158,7 @@ try:
                     print('Failed unkown at file: ',fname)
                     stop_led(led_thread)
                     led_blink = False
-                    start_error(led-threat)
+                    start_error(led_thread)
                     led_error = True
                     log_msg += 'Script failed unknown at file: ' + str(fname) +'\n'
                     f.write('Script failed unknown at file: ' + str(fname) +'\n')
