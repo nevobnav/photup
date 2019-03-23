@@ -137,7 +137,7 @@ try:
                         else:
                             stop_led()
                             led_blink = False
-                            start_error(led-threat)
+                            start_error(led_thread)
                             led_error = True
                             log_msg += 'gdrive upload script failed, resetting counter and trying again'+'\n'
                             f.write('gdrive upload script failed, resetting counter and trying again'+'\n')
@@ -147,7 +147,7 @@ try:
                         print('Uploading loop failed, resetting counter and trying again')
                         stop_led()
                         led_blink = False
-                        start_error(led-threat)
+                        start_error(led_thread)
                         led_error = True
 
                         log_msg += 'Uploading loop failed, resetting counter and trying again'+'\n'
