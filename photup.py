@@ -14,8 +14,8 @@ import configparser
 
 #### DEBUG SETTINGS
 backup= True
-format= False
-upload = False
+format= True
+upload = True
 ####################
 
 syslog.syslog('Python scrip started')
@@ -108,6 +108,8 @@ try:
             #    flickr = authorize_flickr(flickr)
             #create drive object
             drive = create_drive_obj()
+            #Refresh just in case current token has a very short lifespan
+            drive = refresh_drive_obj()
             drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
             #Upload initiation file
             resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
@@ -122,7 +124,8 @@ try:
                     if ((successful_uploads+1)%100) == 0:
                         print('Renewing drive object')
                         log_msg += 'Renewing drive object \n'
-                        drive = create_drive_obj()
+                        #Refreshing every 100 images ensures token is refreshed before running out (after 3600 seconds)
+                        drive = refresh_drive_obj()
                     stop_led(led_thread)
                     led_error = False
                     led_thread = start_blink()

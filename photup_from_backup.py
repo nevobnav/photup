@@ -49,11 +49,10 @@ for fname in files:
     title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
     resp = upload_to_gdrive(drive, title,fname, client_id, drive_folder_scan_id)
     successful_uploads += 1
-    if ((successful_uploads)%10) == 0:
+    if ((successful_uploads)%100) == 0:
        print('Renewing drive object')
        drive = refresh_drive_obj()
 
 end_time = time.time()
 duration = (end_time-start_time)
-exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,'',scan_id,client_id)
 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, drive_folder_scan_id)
