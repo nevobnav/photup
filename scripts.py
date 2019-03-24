@@ -71,8 +71,12 @@ def perform_backup(files):
         #If size is available, copy files. Otherwise don't backup, but let us know via telegram
         if total_file_size < avail_space:
             output += 'Enough avialable space to fit add images to backup drive'+'\n'
+            counter = 1
             for img in files:
-                copy2(img,backup_folder)
+                extension = os.path.splitext(img)
+                img_name = datestring+'_'+client_ID+'_img'+str(counter)+extension[-1]
+                copy2(img,backup_folder+img_name)
+                counter+=1
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
             output += 'Disk full - No images copied!'+'\n'
@@ -153,8 +157,8 @@ def prepare_new_scan(drive,client_id,scan_id):
     filenames = [file['title'] for file in scanfolder_files]
     return filenames, folder_scan_id
 
-def upload_to_gdrive(drive, fname, client_id, drive_folder_scan_id,):
-    img_title =  os.path.basename(fname)
+def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
+    img_title =  title
     no_tries = 0
     drive_filenames = []
     while not(img_title in drive_filenames) and no_tries <10:

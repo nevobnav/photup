@@ -109,12 +109,19 @@ try:
             drive = create_drive_obj()
             drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
             #Upload initiation file
-            resp = upload_to_gdrive(drive, init_file_name, client_id, drive_folder_scan_id)
+            resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
             log_msg += "Currently in drive folder: " + str(drive_filenames) +'\n'
             f.write("Currently in drive folder: " +str(drive_filenames) +'\n')
             #Upload files onto Gdrive
             for fname in files:
+                extension = os.path.splitext(fname)
+                datestirng =  datetime.datetime.now().strftime("%Y%m%d")
+                title = datestring+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
                 try:
+                    if ((successful_uploads+1)%100) == 0:
+                        print('Renewing drive object')
+                        log_msg += 'Renewing drive object \n'
+                        drive = create_drive_obj()
                     stop_led(led_thread)
                     led_error = False
                     led_thread = start_blink()
@@ -129,7 +136,7 @@ try:
                         print('Connection live')
                         log_msg +='Connection live' +'\n'
                         f.write("Connection live \n")
-                        resp = upload_to_gdrive(drive, fname, client_id, drive_folder_scan_id)
+                        resp = upload_to_gdrive(drive, title,fname, client_id, drive_folder_scan_id)
                         if resp is True:
                             log_msg +='Upload succeeded'+'\n'
                             successful_uploads += 1
@@ -166,7 +173,7 @@ try:
             end_time = time.time()
             duration = (end_time-start_time)
             exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id)
-            resp = upload_to_gdrive(drive, exit_file_name, client_id, drive_folder_scan_id)
+            resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, drive_folder_scan_id)
         else:
             stop_led(led_thread)
             led_blink = False
