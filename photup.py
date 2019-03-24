@@ -68,7 +68,7 @@ init_file_name = create_init_file(files,scan_id,client_id)
 
 if imgs and backup:
     try:
-        output, total_file_size = perform_backup(files)
+        output, total_file_size = perform_backup(files,client_id)
     except:
         output, total_file_size = "perform_backup failed. Please check!"
         send_telegram('client {}: perform_backup failed. Please check'.format(client_id),telegram_ids)

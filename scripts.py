@@ -20,7 +20,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 
-def perform_backup(files):
+def perform_backup(files,client_id):
     #This function backups up files from SD if space allows. If not it
     # starts deleting backed up files, old to new, untill space is available.
     # If no space is available still, the files are not backed up.
@@ -74,9 +74,10 @@ def perform_backup(files):
             counter = 1
             for img in files:
                 extension = os.path.splitext(img)
-                img_name = datestring+'_'+client_ID+'_img'+str(counter)+extension[-1]
+                img_name = datestring+'_'+client_id+'_img'+str(counter)+extension[-1]
                 copy2(img,backup_folder+img_name)
                 counter+=1
+                print('Copied image {} of {}.'.format(counter,len(files)))
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
             output += 'Disk full - No images copied!'+'\n'
