@@ -130,6 +130,15 @@ def create_drive_obj():
     drive = GoogleDrive(gauth)
     return drive
 
+def refresh_drive_obj():
+    gauth = GoogleAuth()
+    gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.Refresh()
+    gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    drive = GoogleDrive(gauth)
+    return drive
+
+
 def get_filelist(drive, id):
     query = "'" + id + "' in parents and trashed=false"
     file_list = drive.ListFile({'q': query}).GetList()

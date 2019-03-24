@@ -37,6 +37,7 @@ print(files)
 
 #Check or wait for connection to establish
 drive = create_drive_obj()
+drive = refresh_drive_obj()
 drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
 start_time = time.time()
 
@@ -48,9 +49,9 @@ for fname in files:
     title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
     resp = upload_to_gdrive(drive, title,fname, client_id, drive_folder_scan_id)
     successful_uploads += 1
-    if ((successful_uploads)%50) == 0:
+    if ((successful_uploads)%10) == 0:
        print('Renewing drive object')
-       drive = create_drive_obj()
+       drive = refresh_drive_obj()
 
 end_time = time.time()
 duration = (end_time-start_time)
