@@ -13,6 +13,7 @@ import configparser
 
 #Getting values from USBMOUNT
 backup_folder = "/usr/bin/photup/image_backup/20190322"
+scan_id = "20190322"
 
 successful_uploads = 0  #Used to count number of succesfull uploads
 
@@ -20,7 +21,6 @@ successful_uploads = 0  #Used to count number of succesfull uploads
 settings=configparser.ConfigParser()
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')
-scan_id = datetime.datetime.now().strftime("%Y%m%d")
 telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
 telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
