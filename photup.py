@@ -14,7 +14,7 @@ import configparser
 
 #### DEBUG SETTINGS
 backup= False
-format= True
+format= False
 upload = True
 ####################
 
@@ -77,7 +77,7 @@ if imgs and backup:
 xxbase = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img000001.JPG'
 backup_files = []
 for x in range(1,2532):
-    xxfilename = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img'+x.zfill(6)+'.JPG'
+    xxfilename = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img'+str(x).zfill(6)+'.JPG'
     backup_files.append(xxfilename)
 files = backup_files
 ########################
