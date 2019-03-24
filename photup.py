@@ -14,8 +14,8 @@ import configparser
 
 #### DEBUG SETTINGS
 backup= True
-format= True
-upload = True
+format= False
+upload = False
 ####################
 
 syslog.syslog('Python scrip started')
