@@ -13,7 +13,7 @@ import configparser
 
 
 #### DEBUG SETTINGS
-backup= True
+backup= False
 format= True
 upload = True
 ####################
@@ -73,6 +73,15 @@ if imgs and backup:
     log_msg += output +'\n'
     f.write(output + '\n')
 
+##### DEBUGGING FIX FILE NAMES WIHTOUT BACKUPING ALL IMAGES:
+xxbase = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img000001.JPG'
+backup_files = []
+for x in range(1,2532):
+    xxfilename = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img'+x.zfill(6)+'.JPG'
+    backup_files.append(xxfilename)
+files = backup_files
+########################
+
 #Create init and exit txt files with the full list of images (basename only)
 init_file_name = create_init_file(files,scan_id,client_id)
 
@@ -119,7 +128,7 @@ try:
             #Upload files onto Gdrive
             for fname in files:
                 extension = os.path.splitext(fname)
-                datestirng =  datetime.datetime.now().strftime("%Y%m%d")
+                datestring =  datetime.datetime.now().strftime("%Y%m%d")
                 title = datestring+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
                 try:
                     if ((successful_uploads+1)%100) == 0:
@@ -147,7 +156,7 @@ try:
                             successful_uploads += 1
                             conn_tests = 9999
                         else:
-                            stop_led()
+                            stop_led(led_thread)
                             led_blink = False
                             start_error()
                             led_error = True
@@ -157,7 +166,7 @@ try:
                             break
                     else:
                         print('Uploading loop failed, resetting counter and trying again')
-                        stop_led()
+                        stop_led(led_thread)
                         led_blink = False
                         start_error()
                         led_error = True
