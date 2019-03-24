@@ -29,6 +29,7 @@ def perform_backup(files,client_id):
     backup_folder_location = '/usr/bin/photup/image_backup/'
     datestring = datetime.datetime.now().strftime("%Y%m%d")
     backup_folder = backup_folder_location+datestring+'/'
+    backup_filelist = []
 
     #Create required folders
     if not os.path.exists(backup_folder_location):
@@ -78,6 +79,8 @@ def perform_backup(files,client_id):
                 copy2(img,backup_folder+img_name)
                 counter+=1
                 print('Copied image {} of {}.'.format(counter,len(files)))
+                img_path = backup_folder+img_name
+                backup_filelist.append(img_path)
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
             output += 'Disk full - No images copied!'+'\n'
@@ -87,7 +90,7 @@ def perform_backup(files,client_id):
         output += 'Disk full - No images copied!'+'\n'
         send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
 
-    return output,total_file_size
+    return output,total_file_size, backup_filelist
 
 def get_device_name():
     df = str(check_output("df"))

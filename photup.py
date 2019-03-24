@@ -56,24 +56,25 @@ log_msg += 'Version: '+version+'\n'
 log_msg += 'client_id: {0}'.format(client_id) +'\n'
 f.write(log_msg)
 
-#Get files from disc
+#Get files from SD card
 files = get_filenames(sdcard,extensions)
 imgs = len(files)>0
 no_of_imgs = len(files)
 
 
-#Create init and exit txt files with the full list of images (basename only)
-init_file_name = create_init_file(files,scan_id,client_id)
-
-
 if imgs and backup:
     try:
-        output, total_file_size = perform_backup(files,client_id)
+        output, total_file_size,backup_files = perform_backup(files,client_id)
+        #Overwrite variable 'files' to start uploading from backup, not from SD
+        files = backup_files
     except:
         output, total_file_size = "perform_backup failed. Please check!"
         send_telegram('client {}: perform_backup failed. Please check'.format(client_id),telegram_ids)
     log_msg += output +'\n'
     f.write(output + '\n')
+
+#Create init and exit txt files with the full list of images (basename only)
+init_file_name = create_init_file(files,scan_id,client_id)
 
 print(files)
 print('Checking internet and starting to upload')
