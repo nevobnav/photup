@@ -45,8 +45,7 @@ resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, 
 
 for fname in files:
     extension = os.path.splitext(fname)
-    datestirng =  datetime.datetime.now().strftime("%Y%m%d")
-    title = datestring+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
+    title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
     resp = upload_to_gdrive(drive, title,fname, client_id, drive_folder_scan_id)
     successful_uploads += 1
     if ((successful_uploads)%50) == 0:
