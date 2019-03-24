@@ -51,10 +51,9 @@ for fname in files:
     successful_uploads += 1
     if ((successful_uploads)%50) == 0:
        print('Renewing drive object')
-       log_msg += 'Renewing drive object \n'
        drive = create_drive_obj()
 
 end_time = time.time()
 duration = (end_time-start_time)
-exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id)
+exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,'',scan_id,client_id)
 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, drive_folder_scan_id)
