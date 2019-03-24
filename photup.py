@@ -15,6 +15,7 @@ import configparser
 #### DEBUG SETTINGS
 backup= True
 format= True
+upload = True
 ####################
 
 syslog.syslog('Python scrip started')
@@ -85,7 +86,7 @@ log_msg +=logstring + '\n'
 syslog.syslog(logstring)
 
 try:
-    while conn_tests<100 and len(files)>0:
+    while conn_tests<100 and len(files)>0 and upload:
         if led_error:
             stop_led(led_thread)
             led_error = False
