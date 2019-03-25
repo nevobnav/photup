@@ -13,8 +13,8 @@ import configparser
 
 
 #### DEBUG SETTINGS
-backup= False
-format= False
+backup= True
+format= True
 upload = True
 ####################
 
@@ -35,7 +35,6 @@ led_blink = True
 led_error = False
 total_file_size = 0 #Used to determine total file size of all images combined
 successful_uploads = 0  #Used to count number of succesfull uploads
-
 
 #Basic settings#syslog.syslog('config parser start')
 settings=configparser.ConfigParser()
@@ -73,14 +72,14 @@ if imgs and backup:
     log_msg += output +'\n'
     f.write(output + '\n')
 
-##### DEBUGGING FIX FILE NAMES WIHTOUT BACKUPING ALL IMAGES:
-xxbase = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img000001.JPG'
-backup_files = []
-for x in range(1,2532):
-    xxfilename = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img'+str(x).zfill(6)+'.JPG'
-    backup_files.append(xxfilename)
-files = backup_files
-########################
+# ##### DEBUGGING FIX FILE NAMES WIHTOUT BACKUPING ALL IMAGES:
+# xxbase = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img000001.JPG'
+# backup_files = []
+# for x in range(1,2532):
+#     xxfilename = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img'+str(x).zfill(6)+'.JPG'
+#     backup_files.append(xxfilename)
+# files = backup_files
+# ########################
 
 #Create init and exit txt files with the full list of images (basename only)
 init_file_name = create_init_file(files,scan_id,client_id)
