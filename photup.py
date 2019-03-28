@@ -90,8 +90,7 @@ if backup:
 # files = backup_files
 # ########################
 
-#Create init and exit txt files with the full list of images (basename only)
-init_file_name = create_init_file(files,scan_id,client_id)
+
 
 print(files)
 print('Checking internet and starting to upload')
@@ -129,6 +128,8 @@ try:
             #Refresh just in case current token has a very short lifespan
             drive = refresh_drive_obj()
             drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
+            #Create init and exit txt files with the full list of images (basename only)
+            init_file_name = create_init_file(files,scan_id,client_id,drive_filenames)
             #Upload initiation file
             resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
             log_msg += "Currently in drive folder: " + str(drive_filenames) +'\n'
@@ -138,7 +139,7 @@ try:
                 extension = os.path.splitext(fname)
 
                 #Determine file title, add (1) or (2) etc. for duplicate files
-                duplicate_counter = 0
+                duplicate_counter = 1
                 base_title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
                 title = base_title
                 while title in drive_filenames:

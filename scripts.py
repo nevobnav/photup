@@ -205,12 +205,18 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
     else:
         return False
 
-def create_init_file(files,scan_id,client_id):
+def create_init_file(files,scan_id,client_id,drive_filenames):
     init_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + str(scan_id) + "_init.txt"
     basenames = []
     for file in files:
+        duplicate_counter = 1
         basename = os.path.basename(file)
-        basenames.extend([basename])
+        extension = os.path.splitext(file)[-1]
+        name = basename
+        while name in drive_filenames:
+            name = basename[0:-len_ext]+'({})'.format(duplicate_counter)+basename[-len_ext:]
+            duplicate_counter += 1
+        basenames.extend([name])
     with open(init_file_name,'w') as f:
         f.write( ','.join(basenames))
     return init_file_name
