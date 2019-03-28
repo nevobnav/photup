@@ -212,6 +212,7 @@ def create_init_file(files,scan_id,client_id,drive_filenames):
         duplicate_counter = 1
         basename = os.path.basename(file)
         extension = os.path.splitext(file)[-1]
+        len_ext = len(extension)
         name = basename
         while name in drive_filenames:
             name = basename[0:-len_ext]+'({})'.format(duplicate_counter)+basename[-len_ext:]
