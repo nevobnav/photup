@@ -29,7 +29,7 @@ def perform_backup(files,client_id,scan_id):
     total_file_size = 0 #Used to determine total file size of all images combined
     output = ''
     backup_folder_location = '/usr/bin/photup/image_backup/'
-    backup_folder = backup_folder_location+scan_id+'/'
+    backup_folder_base = backup_folder_location+scan_id+'/'
     backup_filelist = []
     duplicate_counter = 0
 
@@ -37,9 +37,11 @@ def perform_backup(files,client_id,scan_id):
     if not os.path.exists(backup_folder_location):
         os.makedirs(backup_folder_location)
 
+    backup_folder = backup_folder_base
     while os.path.exists(backup_folder):
-        backup_folder = backup_folder[0:-1]+'({})/'.format(duplicate_counter)
+        backup_folder = backup_folder_base[0:-1]+'({})/'.format(duplicate_counter)
         duplicate_counter +=1
+
     os.makedirs(backup_folder)
     existing_scans = os.listdir(backup_folder_location)
     existing_scans.sort()
