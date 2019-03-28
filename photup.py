@@ -230,7 +230,8 @@ try:
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram(exit_msg,telegram_ids)
+            line1= '{}: finished uploading. \n'.format(client_id)
+            send_telegram(line1+exit_msg,telegram_ids)
         else:
             time.sleep(60)
             conn_tests += 1
