@@ -35,6 +35,7 @@ led_blink = True
 led_error = False
 total_file_size = 0 #Used to determine total file size of all images combined
 successful_uploads = 0  #Used to count number of succesfull uploads
+duplicate_counter = 0
 
 #Basic settings#syslog.syslog('config parser start')
 settings=configparser.ConfigParser()
@@ -72,7 +73,7 @@ no_of_imgs = len(files)
 
 if backup:
     try:
-        output, total_file_size,backup_files = perform_backup(files,client_id)
+        output, total_file_size,backup_files = perform_backup(files,client_id, scan_id)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         files = backup_files
     except:
@@ -136,7 +137,15 @@ try:
             #Upload files onto Gdrive
             for fname in files:
                 extension = os.path.splitext(fname)
-                title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
+
+                #Determine file title, add (1) or (2) etc. for duplicate files
+                base_title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
+                title = base_title
+                while base_title in drive_filenames:
+                    title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+'({})'.format(duplicate_counter)+extension[-1]
+                    duplicate_counter += 1
+                    base_title = title
+
                 try:
                     if ((successful_uploads+1)%100) == 0:
                         print('Renewing drive object')

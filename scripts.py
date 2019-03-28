@@ -22,22 +22,25 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 
-def perform_backup(files,client_id):
+def perform_backup(files,client_id,scan_id):
     #This function backups up files from SD if space allows. If not it
     # starts deleting backed up files, old to new, untill space is available.
     # If no space is available still, the files are not backed up.
     total_file_size = 0 #Used to determine total file size of all images combined
     output = ''
     backup_folder_location = '/usr/bin/photup/image_backup/'
-    datestring = datetime.datetime.now().strftime("%Y%m%d")
-    backup_folder = backup_folder_location+datestring+'/'
+    backup_folder = backup_folder_location+scan_id+'/'
     backup_filelist = []
+    duplicate_counter = 0
 
     #Create required folders
     if not os.path.exists(backup_folder_location):
         os.makedirs(backup_folder_location)
-    if not os.path.exists(backup_folder):
-        os.makedirs(backup_folder)
+
+    while os.path.exists(backup_folder):
+        backup_folder = backup_folder[0:-1]+'({})/'.format(duplicate_counter)
+        counter +=1
+    os.makedirs(backup_folder)
     existing_scans = os.listdir(backup_folder_location)
     existing_scans.sort()
 
