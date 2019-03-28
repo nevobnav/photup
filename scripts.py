@@ -85,7 +85,7 @@ def perform_backup(files,client_id,scan_id):
                 img_name = scan_id +'_'+client_id+'_img'+str(counter).zfill(6)+extension[-1]
                 copy2(img,backup_folder+img_name)
                 counter+=1
-                print('Copied image {} of {}.'.format(counter,len(files)))
+                print('Copied image {} of {}.'.format(counter-1,len(files)))
                 img_path = backup_folder+img_name
                 backup_filelist.append(img_path)
         else:

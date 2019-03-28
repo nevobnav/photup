@@ -141,11 +141,9 @@ try:
                 #Determine file title, add (1) or (2) etc. for duplicate files
                 base_title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
                 title = base_title
-                while base_title in drive_filenames:
+                while title in drive_filenames:
                     title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+'({})'.format(duplicate_counter)+extension[-1]
                     duplicate_counter += 1
-                    base_title = title
-
                 try:
                     if ((successful_uploads+1)%100) == 0:
                         print('Renewing drive object')
