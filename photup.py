@@ -136,8 +136,7 @@ try:
             #Upload files onto Gdrive
             for fname in files:
                 extension = os.path.splitext(fname)
-                datestring =  datetime.datetime.now().strftime("%Y%m%d")
-                title = datestring+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
+                title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
                 try:
                     if ((successful_uploads+1)%100) == 0:
                         print('Renewing drive object')
