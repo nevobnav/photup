@@ -300,4 +300,4 @@ def get_img_date(filename):
     dt_str = exif[306]
     dt_object = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
     image_date = dt_object.strftime('%Y%m%d')
-    print(image_date)
+    return(image_date)
