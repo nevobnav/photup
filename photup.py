@@ -77,7 +77,7 @@ if backup:
         #Overwrite variable 'files' to start uploading from backup, not from SD
         files = backup_files
     except:
-        output, total_file_size = "perform_backup failed. Please check!"
+        output = "perform_backup failed. Please check!"
         send_telegram('client {}: perform_backup failed. Please check'.format(client_id),telegram_ids)
     log_msg += output +'\n'
     f.write(output + '\n')
