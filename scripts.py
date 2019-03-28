@@ -80,7 +80,7 @@ def perform_backup(files,client_id,scan_id):
             counter = 1
             for img in files:
                 extension = os.path.splitext(img)
-                img_name = datestring+'_'+client_id+'_img'+str(counter).zfill(6)+extension[-1]
+                img_name = scan_id +'_'+client_id+'_img'+str(counter).zfill(6)+extension[-1]
                 copy2(img,backup_folder+img_name)
                 counter+=1
                 print('Copied image {} of {}.'.format(counter,len(files)))
