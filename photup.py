@@ -35,7 +35,6 @@ led_blink = True
 led_error = False
 total_file_size = 0 #Used to determine total file size of all images combined
 successful_uploads = 0  #Used to count number of succesfull uploads
-duplicate_counter = 0
 
 #Basic settings#syslog.syslog('config parser start')
 settings=configparser.ConfigParser()
@@ -139,6 +138,7 @@ try:
                 extension = os.path.splitext(fname)
 
                 #Determine file title, add (1) or (2) etc. for duplicate files
+                duplicate_counter = 0
                 base_title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
                 title = base_title
                 while title in drive_filenames:
