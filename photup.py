@@ -40,7 +40,6 @@ successful_uploads = 0  #Used to count number of succesfull uploads
 settings=configparser.ConfigParser()
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')
-scan_id = datetime.datetime.now().strftime("%Y%m%d")
 telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
 telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
@@ -58,10 +57,20 @@ f.write(log_msg)
 #Get files from SD card
 files = get_filenames(sdcard,extensions)
 imgs = len(files)>0
+
+#Call an early stop if there are no images on the drive.
+if not imgs:
+    send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
+    log_msg += 'No images found. Quiting. +'\n'
+    f.close()
+    cleanexit(imgs,devname,led_thread, formatting = False, succes=True)
+    quit()
+
+scan_id = get_img_date(files[0])
 no_of_imgs = len(files)
 
 
-if imgs and backup:
+if backup:
     try:
         output, total_file_size,backup_files = perform_backup(files,client_id)
         #Overwrite variable 'files' to start uploading from backup, not from SD

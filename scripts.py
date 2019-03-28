@@ -16,6 +16,8 @@ import datetime
 from shutil import copy2
 from LED import *
 import requests
+from PIL import Image
+from PIL.ExifTags import TAGS
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
@@ -290,3 +292,12 @@ def get_filenames(sdcard,extensions):
             if file.endswith(tuple(extensions)) and not file.startswith("._") and root.find('Trash') == -1:
                 filelist.extend([root+"/"+file])
     return filelist
+
+def get_img_date(filename):
+    image = Image.open(filename)
+    exif = image._getexif()
+    #Exif key for DateTime equals 306
+    dt_str = exif[306]
+    dt_object = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
+    image_date = dt_object.strftime('%Y%m%d')
+    print(image_date)
