@@ -39,7 +39,7 @@ def perform_backup(files,client_id,scan_id):
 
     while os.path.exists(backup_folder):
         backup_folder = backup_folder[0:-1]+'({})/'.format(duplicate_counter)
-        counter +=1
+        duplicate_counter +=1
     os.makedirs(backup_folder)
     existing_scans = os.listdir(backup_folder_location)
     existing_scans.sort()
