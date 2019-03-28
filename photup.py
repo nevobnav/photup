@@ -200,7 +200,7 @@ try:
             #Upload exit file here.
             end_time = time.time()
             duration = (end_time-start_time)
-            exit_file_name = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id)
+            exit_file_name, exit_msg = create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id)
             resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, drive_folder_scan_id)
         else:
             stop_led(led_thread)
@@ -230,11 +230,7 @@ try:
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            try:
-                send_telegram(log_msg,telegram_ids)
-            except:
-                shorter_msg = 'Finalized after {} successful uploads of {} image-files. Too long for regular message.'.format(successful_uploads,len(files))
-                send_telegram(shorter_msg,telegram_ids)
+            send_telegram(exit_msg,telegram_ids)
         else:
             time.sleep(60)
             conn_tests += 1

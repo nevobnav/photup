@@ -232,14 +232,18 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log
     avg_duration = round(duration/no_of_imgs)
     total_file_size = round(total_file_size/1e6)
     avg_file_size = round(total_file_size/no_of_imgs)
+    line1 = 'Succesfull uploads: {} of {}.'.format(successful_uploads,no_of_imgs)
+    line2 = 'Finished in {} minutes at an average of {}s per image.'.format(duration_min,avg_duration)
+    line3 = 'Total uploaded file size equals {}MB at an average of {} per image.'.format(total_file_size, avg_file_size)
+    exit_msg= line1 + line2 + line3
     with open(exit_file_name,'w') as f:
-        f.write('Succesfull uploads: {} of {}.'.format(successful_uploads,no_of_imgs))
-        f.write('Finished in {} minutes at an average of {}s per image.'.format(duration_min,avg_duration))
-        f.write('Total uploaded file size equals {}MB at an average of {} per image.'.format(total_file_size, avg_file_size))
+        f.write(line1)
+        f.write(line2)
+        f.write(line3)
         f.write('Error log:')
         f.write(log_msg)
 
-    return exit_file_name
+    return exit_file_name, exit_msg
 
 
 
