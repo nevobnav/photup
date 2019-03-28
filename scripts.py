@@ -201,7 +201,7 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
         return False
 
 def create_init_file(files,scan_id,client_id):
-    init_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_init.txt"
+    init_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + str(scan_id) + "_init.txt"
     basenames = []
     for file in files:
         basename = os.path.basename(file)
