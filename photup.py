@@ -67,12 +67,14 @@ imgs = len(files)>0
 #Call an early stop if there are no images on the drive.
 try:
     if not imgs:
+        print('no images found')
         send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
         log_msg += 'No images found. Quiting.' +'\n'
         f.close()
         cleanexit(imgs,devname,led_thread, formatting = False, succes=True)
         quit()
 except:
+    print('reached except loop in early-stop call')
     syslog.syslog('No imgs found, failed to send telegram and/or exit')
     cleanexit(imgs,devname,led_thread,formatting = False, succes = False)
     quit()
