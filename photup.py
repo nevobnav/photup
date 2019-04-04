@@ -65,20 +65,18 @@ files = get_filenames(sdcard,extensions)
 imgs = len(files)>0
 
 #Call an early stop if there are no images on the drive.
-# try:
 if not imgs:
-    print('no images found')
-    send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
-    log_msg += 'No images found. Quiting.' +'\n'
-    f.close()
-    cleanexit(imgs,devname,led_thread, formatting = False, succes=True)
-    sys.exit(0)
-# except:
-#     print('reached except loop in early-stop call')
-#     syslog.syslog('No imgs found, failed to send telegram and/or exit')
-#     cleanexit(imgs,devname,led_thread,formatting = False, succes = False)
-#     sys.exit(1)
-
+    try:
+        print('no images found')
+        send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
+        log_msg += 'No images found. Quiting.' +'\n'
+        f.close()
+        cleanexit(imgs,devname,led_thread, formatting = False, succes=True)
+    except:
+        print('reached except loop in early-stop call')
+        syslog.syslog('No imgs found, failed to send telegram and/or exit')
+        cleanexit(imgs,devname,led_thread,formatting = False, succes = False)
+    sys.exit()
 
 
 scan_id = get_img_date(files[0])
