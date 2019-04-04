@@ -17,6 +17,13 @@ format= True
 upload = True
 ####################
 
+# Wait until network is established #
+conn = test_internet()
+while not(conn):
+    syslog.syslog('Photup: cannot establish network - trying again in 5s')
+    time.sleep(5)
+    conn = test_internet()
+
 syslog.syslog('Python scrip started')
 logging.basicConfig(filename = '/usr/bin/photup/logdetails.log', level=logging.DEBUG)
 log_msg = 'New image processing order: \n'
