@@ -72,6 +72,7 @@ if not imgs:
         log_msg += 'No images found. Quiting.' +'\n'
         f.close()
         cleanexit(imgs,devname,led_thread, formatting = False, succes=True)
+    #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
     except:
         print('reached except loop in early-stop call')
         syslog.syslog('No imgs found, failed to send telegram and/or exit')
