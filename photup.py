@@ -72,12 +72,13 @@ if not imgs:
     log_msg += 'No images found. Quiting.' +'\n'
     f.close()
     cleanexit(imgs,devname,led_thread, formatting = False, succes=True)
-    quit()
+    sys.exit(0)
 # except:
 #     print('reached except loop in early-stop call')
 #     syslog.syslog('No imgs found, failed to send telegram and/or exit')
 #     cleanexit(imgs,devname,led_thread,formatting = False, succes = False)
-#     quit()
+#     sys.exit(1)
+
 
 
 scan_id = get_img_date(files[0])
