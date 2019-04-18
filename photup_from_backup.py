@@ -12,8 +12,8 @@ import configparser
 
 
 #Getting values from USBMOUNT
-backup_folder = "/usr/bin/photup/image_backup/20190322"
-scan_id = "20190322"
+backup_folder = "/usr/bin/photup/image_backup/20190416"
+scan_id = "20190416"
 
 successful_uploads = 0  #Used to count number of succesfull uploads
 
@@ -32,7 +32,7 @@ syslog.syslog('loaded all settings')
 files = get_filenames(backup_folder,extensions)
 successful_uploads = 0
 #Create init and exit txt files with the full list of images (basename only)
-init_file_name = create_init_file(files,scan_id,client_id)
+
 print(files)
 
 #Check or wait for connection to establish
@@ -40,6 +40,10 @@ drive = create_drive_obj()
 drive = refresh_drive_obj()
 drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
 start_time = time.time()
+
+drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
+#Create init and exit txt files with the full list of images (basename only)
+init_file_name = create_init_file(files,scan_id,client_id,drive_filenames)
 
 #Upload initiation file
 resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)

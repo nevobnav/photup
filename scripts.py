@@ -103,6 +103,8 @@ def get_device_name():
     df = str(check_output("df"))
     first_occ = df.find("n/dev/sd")
     name = df[first_occ+1:first_occ+10]
+    if ' ' in name:
+        name = df[first_occ+1:first_occ+9]
     return name
 
 def test_internet(timeout = 5):
