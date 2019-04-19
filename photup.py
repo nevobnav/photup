@@ -30,8 +30,8 @@ log_msg = 'New image processing order: \n'
 f = open('log_msg',"a+")
 
 #Getting values from USBMOUNT
-devname = get_device_name()
 mountpoint = "/media/usb0"
+devname = get_device_name(mountpoint)
 
 #initiate
 log = []

@@ -99,13 +99,20 @@ def perform_backup(files,client_id,scan_id):
 
     return output,total_file_size, backup_filelist
 
-def get_device_name():
+def get_device_name(mountpoint):
     df = str(check_output("df"))
     first_occ = df.find("n/dev/sd")
-    name = df[first_occ+1:first_occ+10]
-    if ' ' in name:
-        name = df[first_occ+1:first_occ+9]
-    return name
+    mountpoint = "/media/usb0"
+    mountpoint_char = df.find(mountpoint)
+    inv_mountpoint_char = len(df) - mountpoint_char
+    inv_df = df[::-1]
+    name_linestart_inv = inv_df.find("\\",inv_mountpoint_char)
+    name_linestart = len(df) - name_linestart_inv
+    line = df[name_linestart:mountpoint_char+len(mountpoint)]
+    devname_end = line.find(" ")
+    devname_start = line.find("n")
+    devname = line[devname_start+1:devname_end]
+    return devname
 
 def test_internet(timeout = 5):
     try:
