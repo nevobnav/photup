@@ -133,7 +133,7 @@ syslog.syslog(logstring)
 
 try:
     while conn_tests<100 and len(file_dicts)>0 and upload:
-        a = 200/0
+
         if led_error:
             stop_led(led_thread)
             led_error = False
@@ -189,6 +189,7 @@ try:
                     title = title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
+                    a = 200/0
                     if (sum(successful_uploads.values())+1)%75 == 0:
                         print('Renewing drive object')
                         log_msg += 'Renewing drive object \n'
@@ -284,7 +285,7 @@ try:
             time.sleep(60)
             conn_tests += 1
 
-except:
+except Except as e:
     log_msg += 'Error occured. Broke out of Try-Except around main loop'
     f.write('Error occured. Broke out of Try-Except around main loop')
     conn = False
@@ -293,6 +294,7 @@ except:
         conn = test_internet()
         if conn:
             send_telegram(log_msg,telegram_ids)
+            send_telegram(str(e),telegram_ids)
         else:
             print('Cannot send final Telegram - No interwebs')
             time.sleep(60)
