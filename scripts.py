@@ -21,28 +21,46 @@ from PIL.ExifTags import TAGS
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
+no_of_imgs = {}
+successful_uploads = {}
+files_per_scan = {}
+for scan_id in scan_ids:
+    no_of_imgs[scan_id] = 0
+    successful_uploads[scan_id] = 0
 
-def perform_backup(files,client_id,scan_id):
+
+
+def perform_backup(file_dicts,client_id,backup_folder_location):
     #This function backups up files from SD if space allows. If not it
     # starts deleting backed up files, old to new, untill space is available.
     # If no space is available still, the files are not backed up.
+
+    #initiation
     total_file_size = 0 #Used to determine total file size of all images combined
     output = ''
-    backup_folder_location = '/usr/bin/photup/image_backup/'
-    backup_folder_base = backup_folder_location+scan_id+'/'
-    backup_filelist = []
+    scan_ids = list(set(f['scan_id'] for f in file_dicts))
+
+#    backup_folder_base = backup_folder_location+scan_id+'/'
+    updated_file_dicts = []
     duplicate_counter = 0
 
     #Create required folders
     if not os.path.exists(backup_folder_location):
         os.makedirs(backup_folder_location)
 
-    backup_folder = backup_folder_base
-    while os.path.exists(backup_folder):
-        backup_folder = backup_folder_base[0:-1]+'({})/'.format(duplicate_counter)
-        duplicate_counter +=1
 
-    os.makedirs(backup_folder)
+    #Create the required backup folder for each scan_id. Add (x) for copies
+    backup_folder_dict = {}
+    for scan_id in scan_ids:
+        backup_folder_base = backup_folder_location+scan_id+'/'
+        backup_folder = backup_folder_base
+        while os.path.exists(backup_folder):
+            backup_folder = backup_folder_base[0:-1]+'({})/'.format(duplicate_counter)
+            duplicate_counter +=1
+            backup_folder_dict[scan_id] = backup_folder
+        os.makedirs(backup_folder)
+
+
     existing_scans = os.listdir(backup_folder_location)
     existing_scans.sort()
 
@@ -51,20 +69,27 @@ def perform_backup(files,client_id,scan_id):
     avail_space = target_stats.f_frsize * target_stats.f_bavail
 
     #Determine required size
-    for img in files:
-        image_size = os.path.getsize(img)
+    total_file_size_dict = {}
+    for f in file_dicts:
+        image_size = os.path.getsize(f['filepath'])
+        scan_id = f['scan_id']
+        if scan_id in total_file_size_dict.keys():
+            total_file_size_dict[scan_id] += image_size
+        else:
+            total_file_size_dict[scan_id] = image_size
         total_file_size += image_size
+
 
     #Determine total backup size
     total_backup_size = sum( os.path.getsize(os.path.join(dirpath,filename)) for\
         dirpath, dirnames, filenames in os.walk( backup_folder_location ) for filename in filenames )
-
     if (avail_space + total_backup_size) > total_file_size:
         #Onlny start working if the total file size is workable
 
         #Delete old folders until required size is available or no old folders are left
         while (total_file_size > avail_space) and (len(existing_scans)>1) :
             oldest_dir = backup_folder_location+existing_scans[0]+'/'
+            oldest_dir = '/Users/kazv/Desktop/20190319/'
 
             for file in os.listdir(oldest_dir):
                 os.remove(os.path.join(oldest_dir,file))
@@ -78,16 +103,20 @@ def perform_backup(files,client_id,scan_id):
 
         #If size is available, copy files. Otherwise don't backup, but let us know via telegram
         if total_file_size < avail_space:
-            output += 'Enough avialable space to fit add images to backup drive'+'\n'
+            output += 'Enough available space to fit add images to backup drive'+'\n'
             counter = 1
-            for img in files:
-                extension = os.path.splitext(img)
-                img_name = scan_id +'_'+client_id+'_img'+str(counter).zfill(6)+extension[-1]
-                copy2(img,backup_folder+img_name)
+            for filedict in file_dicts:
+                original_filepath = filedict['filepath']
+                filename = filedict['filename']
+                scan_id = filedict['scan_id']
+                extension = os.path.splitext(filename)
+                backup_name = filedict['base_title']
+                copy2(original_filepath,backup_folder+backup_name)
                 counter+=1
-                print('Copied image {} of {}.'.format(counter-1,len(files)))
-                img_path = backup_folder+img_name
-                backup_filelist.append(img_path)
+                print('Copied image {} of {}.'.format(counter-1,len(file_dicts)))
+                filedict['backup_filename'] = backup_name
+                filedict['backup_filepath'] = backup_folder_dict[scan_id]+backup_name
+                updated_file_dicts.append(filedict)
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
             output += 'Disk full - No images copied!'+'\n'
@@ -97,7 +126,7 @@ def perform_backup(files,client_id,scan_id):
         output += 'Disk full - No images copied!'+'\n'
         send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
 
-    return output,total_file_size, backup_filelist
+    return output, total_file_size_dict, updated_file_dicts
 
 def get_device_name(mountpoint):
     df = str(check_output("df"))
@@ -233,7 +262,7 @@ def create_init_file(files,scan_id,client_id,drive_filenames):
         f.write( ','.join(basenames))
     return init_file_name
 
-def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id):
+def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id,no_of_scans):
     if no_of_imgs == 0:
         no_of_imgs = 1
     exit_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_exit.txt"
@@ -245,11 +274,16 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log
     line2 = 'Time: {}\n'.format(get_now())
     line3 = 'Finished in {} minutes at an average of {}s per image. \n'.format(duration_min,avg_duration)
     line4 = 'Total uploaded file size equals {}MB at an average of {}MB per image.\n'.format(total_file_size, avg_file_size)
+    if no_of_scans>1:
+        line4 +=  'This run included multiple scans, so these statistics may be wrong.\n'
+
     exit_msg= line1 + line2 + line3 + line4
+
     with open(exit_file_name,'w') as f:
         f.write(line1)
         f.write(line2)
-        f.write(line3)
+        if no_of_scans == 1:
+            f.write(line3)
         f.write(line4)
         f.write('Error log:\n')
         f.write(log_msg)
@@ -314,13 +348,19 @@ def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
         return led_thread
 
 
-def get_filenames(sdcard,extensions):
-    filelist = []
+def get_filedicts(sdcard,extensions,client_id):
+    filedicts = []
+    counter = 1
     for root, dirs, files in os.walk(sdcard, topdown=False):
         for file in files:
             if file.endswith(tuple(extensions)) and not file.startswith("._") and root.find('Trash') == -1:
-                filelist.extend([root+"/"+file])
-    return filelist
+                scan_date = get_img_date(root+"/"+file)
+                extension = os.path.splitext(file)
+                base_title = scan_date+'_'+client_id+'_img'+str(counter).zfill(6)+extension[-1]
+                filedict = {'root':root ,'filepath':root+"/"+file, 'filename':file, 'scan_id':scan_date, 'base_title':base_title}
+                filedicts.append(filedict)
+                counter += 1
+    return filedicts
 
 def get_img_date(filename):
     image = Image.open(filename)

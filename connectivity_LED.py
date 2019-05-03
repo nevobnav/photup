@@ -10,7 +10,7 @@ logger = logging.getLogger('myapp')
 hdlr = logging.FileHandler('/usr/bin/photup/conn.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
-logger.addHandler(hdlr) 
+logger.addHandler(hdlr)
 logger.setLevel(logging.WARNING)
 
 
