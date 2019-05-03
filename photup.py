@@ -87,6 +87,8 @@ if not imgs_available:
 
 if backup:
     try:
+        if test_internet():
+            send_telegram('{}: Starting backup procedure.'.format(client_id),telegram_ids)
         output, total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         file_dicts = updated_file_dicts
@@ -189,7 +191,6 @@ try:
                     title = title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
-                    a = 200/0
                     if (sum(successful_uploads.values())+1)%75 == 0:
                         print('Renewing drive object')
                         log_msg += 'Renewing drive object \n'
@@ -241,7 +242,7 @@ try:
                     log_msg += 'Script failed unknown at file: ' + str(title) +'\n'
                     f.write('Script failed unknown at file: ' + str(title) +'\n')
                     conn_tests = 9999
-                    
+
 
             #Upload exit file here.
             end_time = time.time()
@@ -283,6 +284,8 @@ try:
         if conn:
             line1= '{}: finished uploading. \n'.format(client_id)
             send_telegram(line1+exit_msg,telegram_ids)
+            if e:
+                send_telegram(str(e),telegram_ids)
         else:
             time.sleep(60)
             conn_tests += 1
