@@ -290,7 +290,7 @@ try:
             time.sleep(60)
             conn_tests += 1
 
-except Except as e:
+except Exception as e:
     log_msg += 'Error occured. Broke out of Try-Except around main loop'
     f.write('Error occured. Broke out of Try-Except around main loop')
     conn = False
