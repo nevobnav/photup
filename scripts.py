@@ -21,13 +21,6 @@ from PIL.ExifTags import TAGS
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
-no_of_imgs = {}
-successful_uploads = {}
-files_per_scan = {}
-for scan_id in scan_ids:
-    no_of_imgs[scan_id] = 0
-    successful_uploads[scan_id] = 0
-
 
 
 def perform_backup(file_dicts,client_id,backup_folder_location):
