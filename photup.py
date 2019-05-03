@@ -277,15 +277,15 @@ try:
     #Send alert:
     conn = False
     conn_tests = 0
-    log_msg += 'Finalized after {} successful uploads of {} image-files'.format(successful_uploads,len(files))
-    f.write('Finalized after {} successful uploads of {} image-files'.format(successful_uploads,len(files)))
+    log_msg += 'Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts))
+    f.write('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
             line1= '{}: finished uploading. \n'.format(client_id)
             send_telegram(line1+exit_msg,telegram_ids)
-            if e:
-                send_telegram(str(e),telegram_ids)
+            # if e:
+            #     send_telegram(str(e),telegram_ids)
         else:
             time.sleep(60)
             conn_tests += 1
