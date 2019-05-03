@@ -240,7 +240,9 @@ try:
                     led_error = True
                     log_msg += 'Script failed unknown at file: ' + str(title) +'\n'
                     f.write('Script failed unknown at file: ' + str(title) +'\n')
-                    break
+                    conn_tests = 9999
+                    
+
             #Upload exit file here.
             end_time = time.time()
             duration = (end_time-start_time)
