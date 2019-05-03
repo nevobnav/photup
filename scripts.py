@@ -35,7 +35,6 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
 
 #    backup_folder_base = backup_folder_location+scan_id+'/'
     updated_file_dicts = []
-    duplicate_counter = 0
 
     #Create required folders
     if not os.path.exists(backup_folder_location):
@@ -45,12 +44,17 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
     #Create the required backup folder for each scan_id. Add (x) for copies
     backup_folder_dict = {}
     for scan_id in scan_ids:
+        duplicate_counter = 1
         backup_folder_base = backup_folder_location+scan_id+'/'
         backup_folder = backup_folder_base
         while os.path.exists(backup_folder):
             backup_folder = backup_folder_base[0:-1]+'({})/'.format(duplicate_counter)
             duplicate_counter +=1
         os.makedirs(backup_folder)
+        print(backup_folder)
+        print(scan_id)
+        print(backup_folder_dict)
+        print(backup_folder_dict[scan_id])
         backup_folder_dict[scan_id] = backup_folder
 
 
