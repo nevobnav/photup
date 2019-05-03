@@ -50,8 +50,8 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
         while os.path.exists(backup_folder):
             backup_folder = backup_folder_base[0:-1]+'({})/'.format(duplicate_counter)
             duplicate_counter +=1
-            backup_folder_dict[scan_id] = backup_folder
         os.makedirs(backup_folder)
+        backup_folder_dict[scan_id] = backup_folder
 
 
     existing_scans = os.listdir(backup_folder_location)
