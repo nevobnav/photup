@@ -13,7 +13,7 @@ import configparser
 
 #### DEBUG SETTINGS
 backup= True
-format= True
+format= False
 upload = True
 ####################
 
@@ -159,16 +159,14 @@ try:
 
             gdrive_files = {}
 
+            #Create init and exit txt files with the full list of images (basename only)
+            #Upload initiation file
             for scan_id in scan_ids:
                 drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
                 init_file_name = create_init_file(files_per_scan[scan_id],scan_id,client_id,drive_filenames)
                 resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
                 gdrive_files[scan_id] = {'drive_folder_scan_id':drive_folder_scan_id, 'drive_filenames': drive_filenames, 'init_file_name':init_file_name}
 
-            ###drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
-            #Create init and exit txt files with the full list of images (basename only)
-            ###init_file_name = create_init_file(files,scan_id,client_id,drive_filenames)
-            #Upload initiation file
 
             #Upload files onto Gdrive
             for file_dict in file_dicts:
@@ -190,7 +188,7 @@ try:
                     title = title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
-                    if ((sum(successful_uploads.values)()+1)%75) == 0:
+                    if (sum(successful_uploads.values())+1)%75 == 0:
                         print('Renewing drive object')
                         log_msg += 'Renewing drive object \n'
                         #Refreshing every 100 images ensures token is refreshed before running out (after 3600 seconds)
