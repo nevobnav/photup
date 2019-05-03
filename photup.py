@@ -232,8 +232,9 @@ try:
                         f.write('Uploading loop failed, resetting counter and trying again'+'\n')
                         conn_tests += 1
                         break
-                except:
+                except Exception as e:
                     print('Failed unkown at file: ',str(title))
+                    print('Except': str(e))
                     stop_led(led_thread)
                     led_blink = False
                     start_error()
