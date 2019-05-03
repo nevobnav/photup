@@ -133,6 +133,7 @@ syslog.syslog(logstring)
 
 try:
     while conn_tests<100 and len(file_dicts)>0 and upload:
+        a = 200/0
         if led_error:
             stop_led(led_thread)
             led_error = False
@@ -188,7 +189,6 @@ try:
                     title = title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
-                    a = 132/0
                     if (sum(successful_uploads.values())+1)%75 == 0:
                         print('Renewing drive object')
                         log_msg += 'Renewing drive object \n'
@@ -239,6 +239,7 @@ try:
                     led_error = True
                     log_msg += 'Script failed unknown at file: ' + str(title) +'\n'
                     f.write('Script failed unknown at file: ' + str(title) +'\n')
+                    break
             #Upload exit file here.
             end_time = time.time()
             duration = (end_time-start_time)

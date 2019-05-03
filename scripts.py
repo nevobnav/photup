@@ -33,7 +33,7 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
     output = ''
     scan_ids = list(set(f['scan_id'] for f in file_dicts))
 
-#    backup_folder_base = backup_folder_location+scan_id+'/'
+    #    backup_folder_base = backup_folder_location+scan_id+'/'
     updated_file_dicts = []
 
     #Create required folders
@@ -102,10 +102,6 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
                 scan_id = filedict['scan_id']
                 extension = os.path.splitext(filename)
                 backup_name = filedict['base_title']
-                print(backup_name)
-                print(backup_folder)
-                print(backup_folder+backup_name)
-                print(original_filepath)
                 copy2(original_filepath,backup_folder+backup_name)
                 counter+=1
                 print('Copied image {} of {}.'.format(counter-1,len(file_dicts)))
