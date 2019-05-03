@@ -188,6 +188,7 @@ try:
                     title = title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
+                    a = 132/0
                     if (sum(successful_uploads.values())+1)%75 == 0:
                         print('Renewing drive object')
                         log_msg += 'Renewing drive object \n'
