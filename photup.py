@@ -171,7 +171,7 @@ try:
             #Upload files onto Gdrive
             for file_dict in file_dicts:
                 #use backed up image if available:
-                if 'backup_filepath' in file_dict.keys():
+                if 'backup_filepath' in file_dict:
                     file_location = file_dict['backup_filepath']
                 else:
                     file_location = file_dict['filepath']
@@ -204,10 +204,7 @@ try:
                     syslog.syslog(log_msg[0:-3])
                     conn_intermediate = test_internet()
                     if conn_intermediate:
-                        print('Connection live')
-                        log_msg +='Connection live' +'\n'
-                        f.write("Connection live \n")
-                        resp = upload_to_gdrive(drive, title,file_location, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
+
                         if resp is True:
                             log_msg +='Upload succeeded'+'\n'
                             successful_uploads[scan_id] += 1
@@ -234,7 +231,7 @@ try:
                         break
                 except Exception as e:
                     print('Failed unkown at file: ',str(title))
-                    print('Except': str(e))
+                    print('Except', str(e))
                     stop_led(led_thread)
                     led_blink = False
                     start_error()
