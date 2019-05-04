@@ -188,7 +188,7 @@ try:
                 base_title = file_dict['base_title']
                 title = base_title
                 while title in gdrive_files[scan_id]['drive_filenames']:
-                    title = title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
+                    title = base_title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
                     if (sum(successful_uploads.values())+1)%75 == 0:
@@ -244,7 +244,7 @@ try:
                 if backup:
                     total_file_size = total_file_size_dict[scan_id]
                 exit_doubles = 1
-                exit_file_name_base, exit_msg = create_exit_file(no_of_imgs[scan_id],total_file_size, successful_uploads[scan_id],duration,log_msg,scan_id,client_id,no_of_scans = len(scan_ids))
+                exit_file_name_base, exit_msg = create_exit_file(no_of_imgs[scan_id],total_file_size, successful_uploads[scan_id],duration,scan_id,client_id,no_of_scans = len(scan_ids))
                 exit_file_name = exit_file_name_base
                 while exit_file_name in gdrive_files[scan_id]['drive_filenames']:
                     exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
@@ -287,7 +287,6 @@ except Exception as e:
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram(log_msg,telegram_ids)
             send_telegram(str(e),telegram_ids)
         else:
             logging.warning('Cannot send final Telegram - No interwebs')

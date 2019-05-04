@@ -254,7 +254,7 @@ def create_init_file(files,scan_id,client_id,drive_filenames):
         f.write( ','.join(basenames))
     return init_file_name
 
-def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log_msg,scan_id,client_id,no_of_scans):
+def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,scan_id,client_id,no_of_scans):
     if no_of_imgs == 0:
         no_of_imgs = 1
     exit_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + scan_id + "_exit.txt"
@@ -277,8 +277,7 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,log
         if no_of_scans == 1:
             f.write(line3)
         f.write(line4)
-        f.write('Error log:\n')
-        f.write(log_msg)
+
 
     return exit_file_name, exit_msg
 
