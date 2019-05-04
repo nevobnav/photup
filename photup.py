@@ -28,13 +28,6 @@ formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
 console.setFormatter(formatter)
 logging.getLogger("").addHandler(console)
 
-logging.debug('debug')
-logging.info('info')
-logging.warning('warning')
-logging.error('error')
-logging.exception('exp')
-logging.warning('Started Photup')
-
 
 # Wait until network is established #
 conn = test_internet()
@@ -164,7 +157,7 @@ try:
                 drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
                 init_file_name_base = create_init_file(files_per_scan[scan_id],scan_id,client_id,drive_filenames)
                 init_file_name = init_file_name_base
-                while init_file_name in drive_filenames:
+                while os.path.basename(init_file_name) in drive_filenames:
                     init_file_name = init_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     init_doubles += 1
                 resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
@@ -246,7 +239,7 @@ try:
                 exit_doubles = 1
                 exit_file_name_base, exit_msg = create_exit_file(no_of_imgs[scan_id],total_file_size, successful_uploads[scan_id],duration,scan_id,client_id,no_of_scans = len(scan_ids))
                 exit_file_name = exit_file_name_base
-                while exit_file_name in gdrive_files[scan_id]['drive_filenames']:
+                while os.path.basename(exit_file_name) in gdrive_files[scan_id]['drive_filenames']:
                     exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     exit_doubles += 1
                 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
