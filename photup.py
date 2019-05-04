@@ -207,6 +207,10 @@ try:
                     syslog.syslog(log_msg[0:-3])
                     conn_intermediate = test_internet()
                     if conn_intermediate:
+                        print('Connection live')
+                        log_msg += 'Connection live \n'
+                        f.write("Connection live \n")
+                        resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
 
                         if resp is True:
                             log_msg +='Upload succeeded'+'\n'
