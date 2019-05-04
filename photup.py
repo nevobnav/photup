@@ -66,6 +66,7 @@ f.write(log_msg)
 #Get dictionary with filenames and dates from SD card
 #Dict keys: ['root' ,'filepath', 'filename','scan_id']
 file_dicts = get_filedicts(sdcard,extensions, client_id)        #change this
+total_file_size = sum([os.path.getsize(f['filepath']) for f in file_dicts])
 imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
 
@@ -252,7 +253,7 @@ try:
             duration = (end_time-start_time)
 
             for scan_id in scan_ids:
-                if total_file_size_dict:
+                if backup:
                     total_file_size = total_file_size_dict[scan_id]
                 exit_file_name, exit_msg = create_exit_file(no_of_imgs[scan_id],total_file_size, successful_uploads[scan_id],duration,log_msg,scan_id,client_id,no_of_scans = len(scan_ids))
                 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
