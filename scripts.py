@@ -212,7 +212,7 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
     no_tries = 0
     drive_filenames = []
     while not(img_title in drive_filenames) and no_tries <10:
-        print("{} not in current fileset".format(img_title))
+        print("New file: {}".format(img_title))
         newimg = drive.CreateFile({
             'title':img_title,
             "parents": [{
