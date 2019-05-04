@@ -88,7 +88,7 @@ if not imgs_available:
 if backup:
     try:
         if test_internet():
-            send_telegram('{}: Starting backup procedure.'.format(client_id),telegram_ids)
+            send_telegram('{}: starting backup.'.format(client_id),telegram_ids)
         total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         file_dicts = updated_file_dicts
@@ -242,6 +242,7 @@ try:
                     exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     exit_doubles += 1
                 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
+                send_telegram('{}: finished uploading \n'.format(client_id)+exit_msg,telegram_ids)
 
         else:
             stop_led(led_thread)
@@ -257,20 +258,8 @@ try:
     #Close down session
     cleanexit(imgs_available,devname,led_thread,formatting = format, succes = True)
 
-    #Send alert:
-    conn = False
-    conn_tests = 0
     logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
-    while conn is False and conn_tests<100:
-        conn = test_internet()
-        if conn:
-            line1= '{}: finished uploading. \n'.format(client_id)
-            send_telegram(line1+exit_msg,telegram_ids)
-            # if e:
-            #     send_telegram(str(e),telegram_ids)
-        else:
-            time.sleep(60)
-            conn_tests += 1
+
 
 except Exception as e:
     logging.warning('Error occured. Broke out of Try-Except around main loop')

@@ -264,14 +264,13 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,sca
     avg_duration = round(duration/no_of_imgs)
     total_file_size = round(total_file_size/1e6)
     avg_file_size = round(total_file_size/no_of_imgs)
+    line0 = 'Scan_id: {}\n'.format(scan_id)
     line1 = 'Successful uploads: {} of {}. \n'.format(successful_uploads,no_of_imgs)
     line2 = 'Time: {}\n'.format(get_now())
     line3 = 'Finished in {} minutes at an average of {}s per image. \n'.format(duration_min,avg_duration)
     line4 = 'Total uploaded file size equals {}MB at an average of {}MB per image.\n'.format(total_file_size, avg_file_size)
-    if no_of_scans>1:
-        line4 +=  'This run included multiple scans, so these statistics may be wrong.\n'
 
-    exit_msg= line1 + line2 + line3 + line4
+    exit_msg= line0 + line1 + line2 + line3 + line4
 
     with open(exit_file_name,'w') as f:
         f.write(line1)
@@ -279,8 +278,6 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,sca
         if no_of_scans == 1:
             f.write(line3)
         f.write(line4)
-
-
     return exit_file_name, exit_msg
 
 
@@ -341,18 +338,22 @@ def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
         return led_thread
 
 
+
 def get_filedicts(sdcard,extensions,client_id):
     filedicts = []
-    counter = 1
+    counters = {}
     for root, dirs, files in os.walk(sdcard, topdown=False):
         for file in files:
             if file.endswith(tuple(extensions)) and not file.startswith("._") and root.find('Trash') == -1:
                 scan_date = get_img_date(root+"/"+file)
+                if scan_date in counters:
+                    counters[scan_date]+=1
+                else:
+                    counters[scan_date] = 1
                 extension = os.path.splitext(file)
-                base_title = scan_date+'_'+client_id+'_img'+str(counter).zfill(6)+extension[-1]
+                base_title = scan_date+'_'+client_id+'_img'+str(counters[scan_date]).zfill(6)+extension[-1]
                 filedict = {'root':root ,'filepath':root+"/"+file, 'filename':file, 'scan_id':scan_date, 'base_title':base_title}
                 filedicts.append(filedict)
-                counter += 1
     return filedicts
 
 def get_img_date(filename):
