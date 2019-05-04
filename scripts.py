@@ -24,7 +24,7 @@ from pydrive.drive import GoogleDrive
 
 
 
-def perform_backup(file_dicts,client_id,backup_folder_location):
+def perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids):
     #This function backups up files from SD if space allows. If not it
     # starts deleting backed up files, old to new, untill space is available.
     # If no space is available still, the files are not backed up.
@@ -88,7 +88,7 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
             os.rmdir(oldest_dir)
             warning_msg = "Removed folder {} to make space".format(existing_scans[0])
             logging.warning(warning_msg)
-            send_telegram('{}:'.format(client_id)+warning_msg,telegram_IDs)
+            send_telegram('{}:'.format(client_id)+warning_msg,telegram_ids)
             target_stats = os.statvfs(backup_folder_location)
             avail_space = target_stats.f_frsize * target_stats.f_bavail
             existing_scans = os.listdir(backup_folder_location)
@@ -114,11 +114,11 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
             logging.warning('Disk full, no backup performed.')
-            send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
+            send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_ids)
 
     else:
         logging.warning('Disk full, no backup performed.')
-        send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
+        send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_ids)
 
     return total_file_size_dict, updated_file_dicts
 

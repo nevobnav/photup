@@ -89,7 +89,7 @@ if backup:
     try:
         if test_internet():
             send_telegram('{}: starting backup.'.format(client_id),telegram_ids)
-        total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location)
+        total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         file_dicts = updated_file_dicts
     except Exception as e:
