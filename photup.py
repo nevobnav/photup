@@ -13,7 +13,7 @@ import configparser
 
 #### DEBUG SETTINGS
 backup= True
-format= False
+format= True
 upload = True
 ####################
 
