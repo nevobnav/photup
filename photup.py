@@ -94,7 +94,7 @@ if backup:
         file_dicts = updated_file_dicts
     except Exception as e:
         backup = False
-        send_telegram('client {}: perform_backup failed. Please check'.format(client_id),telegram_ids)
+        send_telegram('client {}: perform_backup failed. Please check: {}'.format(client_id,e),telegram_ids)
 
 logging.warning('finished backup procedure')
 #Determine image-file-locations per scan, use backup if available
