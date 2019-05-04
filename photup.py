@@ -160,7 +160,7 @@ try:
                 while os.path.basename(init_file_name) in drive_filenames:
                     init_file_name = init_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     init_doubles += 1
-                resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
+                resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name_base, client_id, drive_folder_scan_id)
                 gdrive_files[scan_id] = {'drive_folder_scan_id':drive_folder_scan_id, 'drive_filenames': drive_filenames, 'init_file_name':init_file_name}
 
 
@@ -242,7 +242,7 @@ try:
                 while os.path.basename(exit_file_name) in gdrive_files[scan_id]['drive_filenames']:
                     exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     exit_doubles += 1
-                resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
+                resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
 
         else:
             stop_led(led_thread)
