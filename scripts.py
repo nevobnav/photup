@@ -6,6 +6,7 @@ import fnmatch
 import re
 import datetime
 import sys
+import logging
 import configparser
 import telepot
 from subprocess import check_output
@@ -80,13 +81,12 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
         #Delete old folders until required size is available or no old folders are left
         while (total_file_size > avail_space) and (len(existing_scans)>1) :
             oldest_dir = backup_folder_location+existing_scans[0]+'/'
-            oldest_dir = '/Users/kazv/Desktop/20190319/'
 
             for file in os.listdir(oldest_dir):
                 os.remove(os.path.join(oldest_dir,file))
 
             os.rmdir(oldest_dir)
-            output += "Removed folder {} to make space".format(existing_scans[0])+'\n'
+            logging.warning("Removed folder {} to make space".format(existing_scans[0]))
             target_stats = os.statvfs(backup_folder_location)
             avail_space = target_stats.f_frsize * target_stats.f_bavail
             existing_scans = os.listdir(backup_folder_location)
@@ -94,7 +94,7 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
 
         #If size is available, copy files. Otherwise don't backup, but let us know via telegram
         if total_file_size < avail_space:
-            output += 'Enough available space to fit add images to backup drive'+'\n'
+            logging.warning('Enough available space to fit add images to backup drive')
             counter = 1
             for filedict in file_dicts:
                 original_filepath = filedict['filepath']
@@ -105,20 +105,20 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
                 backup_folder = backup_folder_dict[scan_id]
                 copy2(original_filepath,backup_folder+backup_name)
                 counter+=1
-                print('Copied image {} of {}.'.format(counter-1,len(file_dicts)))
+                logging.warning('Copied image {} of {}.'.format(counter-1,len(file_dicts)))
                 filedict['backup_filename'] = backup_name
                 filedict['backup_filepath'] = backup_folder_dict[scan_id]+backup_name
                 updated_file_dicts.append(filedict)
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
-            output += 'Disk full - No images copied!'+'\n'
+            logging.warning('Disk full, no backup performed.')
             send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
 
     else:
-        output += 'Disk full - No images copied!'+'\n'
+        logging.warning('Disk full, no backup performed.')
         send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_IDs)
 
-    return output, total_file_size_dict, updated_file_dicts
+    return total_file_size_dict, updated_file_dicts
 
 def get_device_name(mountpoint):
     df = str(check_output("df"))

@@ -89,15 +89,14 @@ if backup:
     try:
         if test_internet():
             send_telegram('{}: Starting backup procedure.'.format(client_id),telegram_ids)
-        output, total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location)
+        total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         file_dicts = updated_file_dicts
     except Exception as e:
         backup = False
-        output = "perform_backup failed: {}".format(str(e))
         send_telegram('client {}: perform_backup failed. Please check'.format(client_id),telegram_ids)
-    logging.warning(output)
 
+logging.warning('finished backup procedure')
 #Determine image-file-locations per scan, use backup if available
 for scan_id in scan_ids:
     no_of_imgs[scan_id] = 0
