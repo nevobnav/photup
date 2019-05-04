@@ -295,5 +295,4 @@ except Exception as e:
     led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
     led_blink = False
     led_error = True
-f.close()
 sys.exit()
