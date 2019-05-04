@@ -123,7 +123,6 @@ for scan_id in scan_ids:
 # ########################
 
 
-print(file_dicts)
 print('Checking internet and starting to upload')
 
 #Check or wait for connection to establish

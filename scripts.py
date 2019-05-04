@@ -102,6 +102,7 @@ def perform_backup(file_dicts,client_id,backup_folder_location):
                 scan_id = filedict['scan_id']
                 extension = os.path.splitext(filename)
                 backup_name = filedict['base_title']
+                backup_folder = backup_folder_dict[scan_id]
                 copy2(original_filepath,backup_folder+backup_name)
                 counter+=1
                 print('Copied image {} of {}.'.format(counter-1,len(file_dicts)))
