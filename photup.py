@@ -34,8 +34,7 @@ logging.warning('warning')
 logging.error('error')
 logging.exception('exp')
 logging.warning('Started Photup')
-logging.warning('Version: {}'.format(version))
-logging.warning('client_id: {0}'.format(client_id))
+
 
 # Wait until network is established #
 conn = test_internet()
@@ -43,8 +42,6 @@ while not(conn):
     logging.warning('Photup: cannot establish network - trying again in 5s')
     time.sleep(5)
     conn = test_internet()
-
-
 
 
 #Getting values from USBMOUNT
@@ -70,6 +67,8 @@ telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
 version= '0.1'
 backup_folder_location = '/usr/bin/photup/image_backup/'
+logging.warning('Version: {}'.format(version))
+logging.warning('client_id: {0}'.format(client_id))
 logging.warning('Loaded all settings')
 
 
