@@ -86,9 +86,9 @@ def perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids):
                 os.remove(os.path.join(oldest_dir,file))
 
             os.rmdir(oldest_dir)
-            warning_msg = "Removed folder {} to make space".format(existing_scans[0])
+            warning_msg = "removed folder {} to make space".format(existing_scans[0])
             logging.warning(warning_msg)
-            send_telegram('{}:'.format(client_id)+warning_msg,telegram_ids)
+            send_telegram('{}: '.format(client_id)+warning_msg,telegram_ids)
             target_stats = os.statvfs(backup_folder_location)
             avail_space = target_stats.f_frsize * target_stats.f_bavail
             existing_scans = os.listdir(backup_folder_location)
