@@ -146,9 +146,9 @@ try:
             start_time = time.time()
             message_text = "{0}: pictures incoming!".format(client_id)
             send_telegram(message_text,telegram_ids)
-            drive,gauth = create_drive_obj()
+            drive = create_drive_obj()
             #Refresh just in case current token has a very short lifespan
-            drive,gauth = refresh_drive_obj()
+            drive = refresh_drive_obj()
 
             gdrive_files = {}
             #Create init and exit txt files with the full list of images (basename only)
@@ -186,7 +186,7 @@ try:
                     duplicate_counter += 1
                 try:
                     utc = pytz.utc
-                    gauth_exp = gauth.credentials.token_expiry
+                    gauth_exp = drive.auth.credentials.token_expiry
                     gauth_exp_utc = utc.localize(gauth_exp)
                     gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
                     now_ts = datetime.datetime.timestamp(datetime.datetime.now())
@@ -195,7 +195,7 @@ try:
                     if exp_remain < minimum_expiration_time:
                         logging.warning('Refreshing drive object now')
                         drive,gauth = refresh_drive_obj()
-                        gauth_exp = gauth.credentials.token_expiry
+                        gauth_exp = drive.auth.credentials.token_expiry
                         gauth_exp_utc = utc.localize(gauth_exp)
                         gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
                         now_ts = datetime.datetime.timestamp(datetime.datetime.now())

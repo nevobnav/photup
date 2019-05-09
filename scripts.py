@@ -175,7 +175,7 @@ def create_drive_obj():
     gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
 
     drive = GoogleDrive(gauth)
-    return drive,gauth
+    return drive
 
 def refresh_drive_obj():
     gauth = GoogleAuth()
@@ -183,7 +183,7 @@ def refresh_drive_obj():
     gauth.Refresh()
     gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
     drive = GoogleDrive(gauth)
-    return drive,gauth
+    return drive
 
 
 def get_filelist(drive, id):
