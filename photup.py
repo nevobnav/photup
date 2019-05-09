@@ -12,7 +12,7 @@ import configparser
 import pytz
 
 #### DEBUG SETTINGS
-backup= False
+backup= True
 format= True
 upload = True
 ####################
@@ -53,7 +53,7 @@ led_error = False
 total_file_size = 0 #Used to determine total file size of all images combined
 
 #Basic settings#syslog.syslog('config parser start')
-minimum_expiration_time = 3600-120   #minimum expiration time in seconds for Gdrive (expires in 3600 secs), refresh when reached.
+minimum_expiration_time = 1800                       #minimum expiration time in seconds for Gdrive (expires in 3600 secs), refresh when reached.
 settings=configparser.ConfigParser()
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')

@@ -154,7 +154,6 @@ def get_now():
     return timestamp_string
 
 def create_drive_obj():
-    gauth = GoogleAuth()
     # Try to load saved client credentials
     gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
     if gauth.credentials is None:
