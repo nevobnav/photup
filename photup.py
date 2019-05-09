@@ -194,7 +194,7 @@ try:
                     logging.warning('Drive object expires in {} minutes'.format(int(exp_remain/60)))
                     if exp_remain < minimum_expiration_time:
                         logging.warning('Refreshing drive object now')
-                        drive,gauth = refresh_drive_obj()
+                        drive = refresh_drive_obj()
                         gauth_exp = drive.auth.credentials.token_expiry
                         gauth_exp_utc = utc.localize(gauth_exp)
                         gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
