@@ -182,6 +182,7 @@ def refresh_drive_obj():
     gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
     gauth.Refresh()
     gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.Authorize()
     drive = GoogleDrive(gauth)
     return drive
 
