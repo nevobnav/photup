@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import flickrapi
 import pprint
 import os
 import fnmatch
@@ -162,6 +161,11 @@ def create_drive_obj():
         # Authenticate if they're not there
         gauth.LocalWebserverAuth()
     elif gauth.access_token_expired:
+        #Get UTC expiration datetime: gauth.credentials.token_expiry
+        #Time remaining in timedelta: diff = datetime.datetime.now()-gauth.credentials.token_expiry
+        #time_remaining = int(diff.total_seconds())
+        #Have to take UTC into account, so : utc=pytz.utc
+        #exp_ts = datetime.datetime.timestamp(utc.localize(gauth.credentials.token_expiry))
         # Refresh them if expired
         gauth.Refresh()
     else:
@@ -171,7 +175,7 @@ def create_drive_obj():
     gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
 
     drive = GoogleDrive(gauth)
-    return drive
+    return drive,gauth
 
 def refresh_drive_obj():
     gauth = GoogleAuth()
@@ -179,7 +183,7 @@ def refresh_drive_obj():
     gauth.Refresh()
     gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
     drive = GoogleDrive(gauth)
-    return drive
+    return drive,gauth
 
 
 def get_filelist(drive, id):

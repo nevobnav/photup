@@ -9,10 +9,10 @@ import datetime
 import time
 import logging
 import configparser
-
+import pytz
 
 #### DEBUG SETTINGS
-backup= True
+backup= False
 format= True
 upload = True
 ####################
@@ -42,6 +42,7 @@ mountpoint = "/media/usb0"
 devname = get_device_name(mountpoint)
 
 #initiate
+utc = pytz.utc
 no_of_imgs = {}
 successful_uploads = {}
 files_per_scan = {}
@@ -52,6 +53,7 @@ led_error = False
 total_file_size = 0 #Used to determine total file size of all images combined
 
 #Basic settings#syslog.syslog('config parser start')
+minimum_expiration_time = 3600-60   #minimum expiration time in seconds for Gdrive (expires in 3600 secs), refresh when reached.
 settings=configparser.ConfigParser()
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')
@@ -144,9 +146,9 @@ try:
             start_time = time.time()
             message_text = "{0}: pictures incoming!".format(client_id)
             send_telegram(message_text,telegram_ids)
-            drive = create_drive_obj()
+            drive,gauth = create_drive_obj()
             #Refresh just in case current token has a very short lifespan
-            drive = refresh_drive_obj()
+            drive,gauth = refresh_drive_obj()
 
             gdrive_files = {}
             #Create init and exit txt files with the full list of images (basename only)
@@ -183,11 +185,27 @@ try:
                     title = base_title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
                     duplicate_counter += 1
                 try:
-                    if (sum(successful_uploads.values())+1)%75 == 0:
-                        print('Renewing drive object')
-                        logging.warning('Renewing gdrive object')
+                    utc = pytz.utc
+                    gauth_exp = gauth.credentials.token_expiry
+                    gauth_exp_utc = utc.localize(gauth_exp)
+                    gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
+                    now_ts = datetime.datetime.timestamp(datetime.datetime.now())
+                    exp_remain = int(gauth_exp_ts - now_ts)
+                    logging.warning('Drive object expires in {} minutes'.format(int(exp_remain/60)))
+                    if exp_remain < minimum_expiration_time:
+                        logging.warning('Refreshing drive object now')
+                        drive,gauth = refresh_drive_obj()
+                        gauth_exp = gauth.credentials.token_expiry
+                        gauth_exp_utc = utc.localize(gauth_exp)
+                        gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
+                        now_ts = datetime.datetime.timestamp(datetime.datetime.now())
+                        exp_remain = int(gauth_exp_ts - now_ts)
+                        logging.warning('New drive objected OK for {} minutes'.format(int(exp_remain/60)))
+                    # if (sum(successful_uploads.values())+1)%75 == 0:
+                        # print('Renewing drive object')
+                        # logging.warning('Renewing gdrive object')
                         #Refreshing every 100 images ensures token is refreshed before running out (after 3600 seconds)
-                        drive = refresh_drive_obj()
+                        # drive,gauth = refresh_drive_obj()
                     stop_led(led_thread)
                     led_error = False
                     led_thread = start_blink()
