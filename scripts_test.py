@@ -218,7 +218,7 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
     img_title =  title
     no_tries = 0
     drive_filenames = []
-    while not(img_title in drive_filenames) and no_tries <10:
+        while not(img_title in drive_filenames) and no_tries <10:
         print("New file: {}".format(img_title))
         newimg = drive.CreateFile({
             'title':img_title,
@@ -322,7 +322,7 @@ def create_flickr_obj():
     return flickr
 
 
-def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
+def cleanexit(imgs,devname,led, formatting = True, succes=True):
     call(["sudo","umount",devname])
     #Check if there are any images. If not, it may be the wrong usb stick used
     #for dev work. Dont' wanna format that one.
@@ -333,14 +333,11 @@ def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
             print("Formatting SD...")
             call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
     if succes:
-        stop_led(led_thread)
-        led_succes()
+        led.finish()
+        time.sleep(5)
+        led.on()
     else:
-        stop_led(led_thread)
-        led_thread = start_error()
-        time.sleep(200)
-        stop_led(led_thread)
-        return led_thread
+        led.error()
 
 
 

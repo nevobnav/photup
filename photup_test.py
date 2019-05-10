@@ -4,7 +4,7 @@ import sys
 import syslog
 from scripts_test import *
 from shutil import copy2
-from LED import *
+from LED_test import *
 import datetime
 import time
 import logging
@@ -16,6 +16,7 @@ backup= False
 format= True
 upload = True
 ####################
+
 
 #Setup logs:
 logging.root.handlers = []
@@ -47,9 +48,8 @@ no_of_imgs = {}
 successful_uploads = {}
 files_per_scan = {}
 sdcard = mountpoint +"/"
-led_thread = start_blink()
-led_blink = True
-led_error = False
+led = LED()
+led.blink()
 total_file_size = 0 #Used to determine total file size of all images combined
 
 #Basic settings#syslog.syslog('config parser start')
@@ -79,11 +79,12 @@ if not imgs_available:
     try:
         logging.warning('No imgs found')
         send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
-        cleanexit(imgs_available,devname,led_thread, formatting = False, succes=True)
+        cleanexit(imgs_available,devname,led, formatting = False, succes=True)
     #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
     except:
         logging.warning('reached except loop in early-stop call')
-        cleanexit(imgs_available,devname,led_thread,formatting = False, succes = False)
+        cleanexit(imgs_available,devname,led,formatting = False, succes = False)
+        led.reset()
     sys.exit()
 
 
@@ -134,11 +135,7 @@ logging.warning('No. of images found on disc:{}'.format(str(len(file_dicts))))
 #try:
 #while conn_tests<100 and len(file_dicts)>0 and upload:
 
-if led_error:
-    stop_led(led_thread)
-    led_error = False
-    led_thread = start_blink()
-    led_bink = True
+led.blink()
 
 conn = test_internet()
 logging.warning('Connection before upload: {}'.format(str(conn)))
@@ -206,10 +203,7 @@ for file_dict in file_dicts:
         # logging.warning('Renewing gdrive object')
         #Refreshing every 100 images ensures token is refreshed before running out (after 3600 seconds)
         # drive,gauth = refresh_drive_obj()
-    stop_led(led_thread)
-    led_error = False
-    led_thread = start_blink()
-    led_blink = True
+    led.blink()
 
     logging.warning('Uploading file: {}'.format(file_dict['base_title']))
     conn_intermediate = test_internet()
@@ -222,19 +216,13 @@ for file_dict in file_dicts:
             successful_uploads[scan_id] += 1
             conn_tests = 9999
         else:
-            stop_led(led_thread)
-            led_blink = False
-            start_error()
-            led_error = True
+            led.error()
             logging.warning('Upload failed, resetting counter and trying again')
             conn_tests += 1
             break
     else:
         logging.warning('Uploading loop failed, resetting counter and trying again')
-        stop_led(led_thread)
-        led_blink = False
-        start_error()
-        led_error = True
+        led.error()
         conn_tests += 1
         break
     # except Exception as e:
@@ -274,7 +262,7 @@ for scan_id in scan_ids:
 #     logging.warning('Retry connection - attempt no {}'.format(str(conn_tests)))
 
 #Close down session
-cleanexit(imgs_available,devname,led_thread,formatting = format, succes = True)
+cleanexit(imgs_available,devname,led,formatting = format, succes = True)
 
 logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
 
