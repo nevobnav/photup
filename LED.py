@@ -3,6 +3,7 @@ import time
 import threading
 import RPi.GPIO as GPIO
 
+
 def led_on(LEDpin = 27):
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
@@ -10,6 +11,7 @@ def led_on(LEDpin = 27):
     GPIO.output(LEDpin,GPIO.HIGH)
     print('LED on')
     return
+
 
 def start_blink():
     t = threading.Thread(target = led_blink)
@@ -93,6 +95,3 @@ def led_succes(LEDpin = 27):
         repeat_ix +=1
     led_on()
     return
-
-
-

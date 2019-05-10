@@ -131,167 +131,167 @@ conn_tests = 0
 
 logging.warning('No. of images found on disc:{}'.format(str(len(file_dicts))))
 
-try:
-    while conn_tests<100 and len(file_dicts)>0 and upload:
+#try:
+#while conn_tests<100 and len(file_dicts)>0 and upload:
 
-        if led_error:
-            stop_led(led_thread)
-            led_error = False
-            led_thread = start_blink()
-            led_bink = True
+if led_error:
+    stop_led(led_thread)
+    led_error = False
+    led_thread = start_blink()
+    led_bink = True
 
-        conn = test_internet()
-        logging.warning('Connection before upload: {}'.format(str(conn)))
-        if conn:
-            start_time = time.time()
-            message_text = "{0}: pictures incoming!".format(client_id)
-            send_telegram(message_text,telegram_ids)
-            drive = create_drive_obj()
-            #Refresh just in case current token has a very short lifespan
-            drive = refresh_drive_obj()
+conn = test_internet()
+logging.warning('Connection before upload: {}'.format(str(conn)))
+#if conn:
+start_time = time.time()
+message_text = "{0}: pictures incoming!".format(client_id)
+send_telegram(message_text,telegram_ids)
+drive = create_drive_obj()
+#Refresh just in case current token has a very short lifespan
+drive = refresh_drive_obj()
 
-            gdrive_files = {}
-            #Create init and exit txt files with the full list of images (basename only)
-            #Upload initiation file
-            for scan_id in scan_ids:
-                init_doubles = 1
-                drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
-                init_file_name_base = create_init_file(files_per_scan[scan_id],scan_id,client_id,drive_filenames)
-                init_file_name = init_file_name_base
-                while os.path.basename(init_file_name) in drive_filenames:
-                    init_file_name = init_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
-                    init_doubles += 1
-                resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name_base, client_id, drive_folder_scan_id)
-                gdrive_files[scan_id] = {'drive_folder_scan_id':drive_folder_scan_id, 'drive_filenames': drive_filenames, 'init_file_name':init_file_name}
+gdrive_files = {}
+#Create init and exit txt files with the full list of images (basename only)
+#Upload initiation file
+for scan_id in scan_ids:
+    init_doubles = 1
+    drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
+    init_file_name_base = create_init_file(files_per_scan[scan_id],scan_id,client_id,drive_filenames)
+    init_file_name = init_file_name_base
+    while os.path.basename(init_file_name) in drive_filenames:
+        init_file_name = init_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
+        init_doubles += 1
+    resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name_base, client_id, drive_folder_scan_id)
+    gdrive_files[scan_id] = {'drive_folder_scan_id':drive_folder_scan_id, 'drive_filenames': drive_filenames, 'init_file_name':init_file_name}
 
 
-            #Upload files onto Gdrive
-            for file_dict in file_dicts:
-                #use backed up image if available:
-                if 'backup_filepath' in file_dict:
-                    file_location = file_dict['backup_filepath']
-                else:
-                    file_location = file_dict['filepath']
+#Upload files onto Gdrive
+for file_dict in file_dicts:
+    #use backed up image if available:
+    if 'backup_filepath' in file_dict:
+        file_location = file_dict['backup_filepath']
+    else:
+        file_location = file_dict['filepath']
 
-                extension = os.path.splitext(file_dict['filename'])[-1]
-                scan_id = file_dict['scan_id']
-                no_of_imgs[scan_id] += 1
+    extension = os.path.splitext(file_dict['filename'])[-1]
+    scan_id = file_dict['scan_id']
+    no_of_imgs[scan_id] += 1
 
-                #Determine file title, add (1) or (2) etc. for duplicate files
-                duplicate_counter = 1
-                base_title = file_dict['base_title']
-                title = base_title
-                while title in gdrive_files[scan_id]['drive_filenames']:
-                    title = base_title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
-                    duplicate_counter += 1
-                try:
-                    utc = pytz.utc
-                    gauth_exp = drive.auth.credentials.token_expiry
-                    gauth_exp_utc = utc.localize(gauth_exp)
-                    gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
-                    now_ts = datetime.datetime.timestamp(datetime.datetime.now())
-                    exp_remain = int(gauth_exp_ts - now_ts)
-                    logging.warning('Drive object expires in {} minutes'.format(int(exp_remain/60)))
-                    if exp_remain < minimum_expiration_time:
-                        logging.warning('Refreshing drive object now')
-                        drive = refresh_drive_obj()
-                        gauth_exp = drive.auth.credentials.token_expiry
-                        gauth_exp_utc = utc.localize(gauth_exp)
-                        gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
-                        now_ts = datetime.datetime.timestamp(datetime.datetime.now())
-                        exp_remain = int(gauth_exp_ts - now_ts)
-                        logging.warning('New drive objected OK for {} minutes'.format(int(exp_remain/60)))
-                    # if (sum(successful_uploads.values())+1)%75 == 0:
-                        # print('Renewing drive object')
-                        # logging.warning('Renewing gdrive object')
-                        #Refreshing every 100 images ensures token is refreshed before running out (after 3600 seconds)
-                        # drive,gauth = refresh_drive_obj()
-                    stop_led(led_thread)
-                    led_error = False
-                    led_thread = start_blink()
-                    led_bink = True
+    #Determine file title, add (1) or (2) etc. for duplicate files
+    duplicate_counter = 1
+    base_title = file_dict['base_title']
+    title = base_title
+    while title in gdrive_files[scan_id]['drive_filenames']:
+        title = base_title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
+        duplicate_counter += 1
+    #try:
+    utc = pytz.utc
+    gauth_exp = drive.auth.credentials.token_expiry
+    gauth_exp_utc = utc.localize(gauth_exp)
+    gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
+    now_ts = datetime.datetime.timestamp(datetime.datetime.now())
+    exp_remain = int(gauth_exp_ts - now_ts)
+    logging.warning('Drive object expires in {} minutes'.format(int(exp_remain/60)))
+    if exp_remain < minimum_expiration_time:
+        logging.warning('Refreshing drive object now')
+        drive = refresh_drive_obj()
+        gauth_exp = drive.auth.credentials.token_expiry
+        gauth_exp_utc = utc.localize(gauth_exp)
+        gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
+        now_ts = datetime.datetime.timestamp(datetime.datetime.now())
+        exp_remain = int(gauth_exp_ts - now_ts)
+        logging.warning('New drive objected OK for {} minutes'.format(int(exp_remain/60)))
+    # if (sum(successful_uploads.values())+1)%75 == 0:
+        # print('Renewing drive object')
+        # logging.warning('Renewing gdrive object')
+        #Refreshing every 100 images ensures token is refreshed before running out (after 3600 seconds)
+        # drive,gauth = refresh_drive_obj()
+    stop_led(led_thread)
+    led_error = False
+    led_thread = start_blink()
+    led_blink = True
 
-                    logging.warning('Uploading file: {}'.format(file_dict['base_title']))
-                    conn_intermediate = test_internet()
-                    if conn_intermediate:
-                        logging.warning('Connection live')
-                        resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
+    logging.warning('Uploading file: {}'.format(file_dict['base_title']))
+    conn_intermediate = test_internet()
+    if conn_intermediate:
+        logging.warning('Connection live')
+        resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
 
-                        if resp is True:
-                            logging.warning('Upload successful')
-                            successful_uploads[scan_id] += 1
-                            conn_tests = 9999
-                        else:
-                            stop_led(led_thread)
-                            led_blink = False
-                            start_error()
-                            led_error = True
-                            logging.warning('Upload failed, resetting counter and trying again')
-                            conn_tests += 1
-                            break
-                    else:
-                        logging.warning('Uploading loop failed, resetting counter and trying again')
-                        stop_led(led_thread)
-                        led_blink = False
-                        start_error()
-                        led_error = True
-                        conn_tests += 1
-                        break
-                except Exception as e:
-                    logging.warning('Failed unkown at file:{}'.format(title))
-                    logging.warning('Exception: {}'.format(str(e)))
-                    stop_led(led_thread)
-                    led_blink = False
-                    start_error()
-                    led_error = True
-                    conn_tests = 9999
-
-            #Upload exit file here.
-            end_time = time.time()
-            duration = (end_time-start_time)
-
-            for scan_id in scan_ids:
-                if backup:
-                    total_file_size = total_file_size_dict[scan_id]
-                exit_doubles = 1
-                exit_file_name_base, exit_msg = create_exit_file(no_of_imgs[scan_id],total_file_size, successful_uploads[scan_id],duration,scan_id,client_id,no_of_scans = len(scan_ids))
-                exit_file_name = exit_file_name_base
-                while os.path.basename(exit_file_name) in gdrive_files[scan_id]['drive_filenames']:
-                    exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
-                    exit_doubles += 1
-                resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
-                send_telegram('{}: finished uploading \n'.format(client_id)+exit_msg,telegram_ids)
-
+        if resp is True:
+            logging.warning('Upload successful')
+            successful_uploads[scan_id] += 1
+            conn_tests = 9999
         else:
             stop_led(led_thread)
             led_blink = False
-            led_thread = start_error()
+            start_error()
             led_error = True
-            logging.warning('No connection found. Upload has not started. Going to sleep for 60s and try again')
-            time.sleep(60)
-            conn_tests +=1
-            logging_conn_issue = "Retry connection - attempt no " + str(conn_tests)
-            logging.warning('Retry connection - attempt no {}'.format(str(conn_tests)))
-
-    #Close down session
-    cleanexit(imgs_available,devname,led_thread,formatting = format, succes = True)
-
-    logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
-
-
-except Exception as e:
-    logging.warning('Error occured. Broke out of Try-Except around main loop')
-    conn = False
-    conn_tests = 0
-    while conn is False and conn_tests<100:
-        conn = test_internet()
-        if conn:
-            send_telegram(str(e),telegram_ids)
-        else:
-            logging.warning('Cannot send final Telegram - No interwebs')
-            time.sleep(60)
+            logging.warning('Upload failed, resetting counter and trying again')
             conn_tests += 1
-    led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
-    led_blink = False
-    led_error = True
+            break
+    else:
+        logging.warning('Uploading loop failed, resetting counter and trying again')
+        stop_led(led_thread)
+        led_blink = False
+        start_error()
+        led_error = True
+        conn_tests += 1
+        break
+    # except Exception as e:
+    #     logging.warning('Failed unkown at file:{}'.format(title))
+    #     logging.warning('Exception: {}'.format(str(e)))
+    #     stop_led(led_thread)
+    #     led_blink = False
+    #     start_error()
+    #     led_error = True
+    #     conn_tests = 9999
+
+#Upload exit file here.
+end_time = time.time()
+duration = (end_time-start_time)
+
+for scan_id in scan_ids:
+    if backup:
+        total_file_size = total_file_size_dict[scan_id]
+    exit_doubles = 1
+    exit_file_name_base, exit_msg = create_exit_file(no_of_imgs[scan_id],total_file_size, successful_uploads[scan_id],duration,scan_id,client_id,no_of_scans = len(scan_ids))
+    exit_file_name = exit_file_name_base
+    while os.path.basename(exit_file_name) in gdrive_files[scan_id]['drive_filenames']:
+        exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
+        exit_doubles += 1
+    resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
+    send_telegram('{}: finished uploading \n'.format(client_id)+exit_msg,telegram_ids)
+
+# else:
+#     stop_led(led_thread)
+#     led_blink = False
+#     led_thread = start_error()
+#     led_error = True
+#     logging.warning('No connection found. Upload has not started. Going to sleep for 60s and try again')
+#     time.sleep(60)
+#     conn_tests +=1
+#     logging_conn_issue = "Retry connection - attempt no " + str(conn_tests)
+#     logging.warning('Retry connection - attempt no {}'.format(str(conn_tests)))
+
+#Close down session
+cleanexit(imgs_available,devname,led_thread,formatting = format, succes = True)
+
+logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
+
+
+#except Exception as e:
+    # logging.warning('Error occured. Broke out of Try-Except around main loop')
+    # conn = False
+    # conn_tests = 0
+    # while conn is False and conn_tests<100:
+    #     conn = test_internet()
+    #     if conn:
+    #         send_telegram(str(e),telegram_ids)
+    #     else:
+    #         logging.warning('Cannot send final Telegram - No interwebs')
+    #         time.sleep(60)
+    #         conn_tests += 1
+    # led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
+    # led_blink = False
+    # led_error = True
 sys.exit()
