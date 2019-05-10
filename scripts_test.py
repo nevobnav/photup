@@ -189,7 +189,11 @@ def refresh_drive_obj():
 
 def get_filelist(drive, id):
     query = "'" + id + "' in parents and trashed=false"
+    before = datetime.datetime.now() #DEBUG
     file_list = drive.ListFile({'q': query}).GetList()
+    after = datetime.datetime.now() #DEBUG
+    time = round((after - before).total_seconds())
+    logging.warning('Getting filelist in {} seconds'.format(time))
     return file_list
 
 def find_or_create_folder(drive, title, id):
@@ -216,10 +220,13 @@ def prepare_new_scan(drive,client_id,scan_id):
 
 def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
     img_title =  title
-    no_tries = 0
+    no_tries = 1
     drive_filenames = []
     while not(img_title in drive_filenames) and no_tries <10:
-        print("New file: {}".format(img_title))
+        line = "New file: {}, try {}".format(img_title,no_tries)
+        print(line)
+        logging.warning(line)
+
         newimg = drive.CreateFile({
             'title':img_title,
             "parents": [{
@@ -230,7 +237,9 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
         newimg.SetContentFile(fname)
         try:
             newimg.Upload()
-        except:
+        except Exception as e:
+            logging.warning('Exception in upload_to_gdrive')
+            logging.warning(e)
             pass
         scanfolder_files = get_filelist(drive,drive_folder_scan_id)
         drive_filenames = [file['title'] for file in scanfolder_files]

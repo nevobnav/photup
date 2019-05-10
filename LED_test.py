@@ -34,13 +34,13 @@ class LED(object):
     #These functions describe LED modes. Ledmode is set such that self.__blink_pin
     #knows what the latest mode is.
 
-    def blink(self,time_on = 0.05, time_off = 0.7):
+    def blink(self,interval = 0.6):
         #Start blinking at the end of a previous cylce, so it doens't interfere
         self.__ledmode = LED.LED_BLINK
         self.__turnledon()
-        time.sleep(time_on)
+        time.sleep(interval)
         self.__turnledoff()
-        time.sleep(time_off)
+        time.sleep(interval)
 
     def error(self,time_on = 0.1, time_off = 0.7):
         #Start blinking at the end of a previous cylce, so it doens't interfere

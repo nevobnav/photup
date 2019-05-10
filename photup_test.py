@@ -282,4 +282,5 @@ logging.warning('Finalized after {} successful uploads of {} image-files'.format
     # led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
     # led_blink = False
     # led_error = True
+led.reset()
 sys.exit()
