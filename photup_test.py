@@ -183,7 +183,6 @@ for file_dict in file_dicts:
         title = base_title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
         duplicate_counter += 1
 
-    resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id]) #debug
     #try:
     utc = pytz.utc
     gauth_exp = drive.auth.credentials.token_expiry
