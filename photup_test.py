@@ -12,7 +12,7 @@ import configparser
 import pytz
 
 #### DEBUG SETTINGS
-backup= True
+backup= False
 format= True
 upload = True
 ####################
