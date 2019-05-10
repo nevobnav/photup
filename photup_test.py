@@ -162,6 +162,7 @@ for scan_id in scan_ids:
     gdrive_files[scan_id] = {'drive_folder_scan_id':drive_folder_scan_id, 'drive_filenames': drive_filenames, 'init_file_name':init_file_name}
 
 
+
 #Upload files onto Gdrive
 for file_dict in file_dicts:
     #use backed up image if available:
@@ -181,6 +182,8 @@ for file_dict in file_dicts:
     while title in gdrive_files[scan_id]['drive_filenames']:
         title = base_title[:-len(extension)]+ '({})'.format(duplicate_counter) + extension
         duplicate_counter += 1
+
+    resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id]) #debug
     #try:
     utc = pytz.utc
     gauth_exp = drive.auth.credentials.token_expiry
@@ -209,7 +212,7 @@ for file_dict in file_dicts:
     conn_intermediate = test_internet()
     if conn_intermediate:
         logging.warning('Connection live')
-        resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id]['drive_folder_scan_id'])
+        resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id])
 
         if resp is True:
             logging.warning('Upload successful')

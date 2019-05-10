@@ -218,11 +218,13 @@ def prepare_new_scan(drive,client_id,scan_id):
     filenames = [file['title'] for file in scanfolder_files]
     return filenames, folder_scan_id
 
-def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
+def upload_to_gdrive(drive, title, fname, client_id, gdrive_files):
+    drive_folder_scan_id = gdrive_files['drive_folder_scan_id']
+    scanfolder_files = gdrive_files['drive_filenames']
     img_title =  title
-    no_tries = 1
-    drive_filenames = []
-    while not(img_title in drive_filenames) and no_tries <10:
+    no_tries = 0
+    succes = False
+    while no_tries <10 and not(succes):
         line = "New file: {}, try {}".format(img_title,no_tries)
         print(line)
         logging.warning(line)
@@ -237,19 +239,17 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
         newimg.SetContentFile(fname)
         try:
             newimg.Upload()
+            succes = True
         except Exception as e:
             logging.warning('Exception in upload_to_gdrive')
             logging.warning(e)
             pass
-        scanfolder_files = get_filelist(drive,drive_folder_scan_id)
-        drive_filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
-    if img_title in drive_filenames:
-        if no_tries == 0:
-            print("{} already in drive".format(img_title))
+    if succes is True:
         return True
     else:
         return False
+
 
 def create_init_file(files,scan_id,client_id,drive_filenames):
     init_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + str(scan_id) + "_init.txt"
