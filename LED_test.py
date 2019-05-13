@@ -42,13 +42,13 @@ class LED(object):
         self.__turnledoff()
         time.sleep(interval)
 
-    def error(self,time_on = 0.1, time_off = 0.7):
+    def error(self,time_on = 0.1, time_off = 1):
         #Start blinking at the end of a previous cylce, so it doens't interfere
         self.__ledmode = LED.LED_ERROR
         self.__turnledon()
         time.sleep(time_on)
         self.__turnledoff()
-        time.sleep(time_off)
+        time.sleep(time_on)
         self.__turnledon()
         time.sleep(time_on)
         self.__turnledoff()
