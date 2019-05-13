@@ -12,6 +12,7 @@ from subprocess import check_output
 from subprocess import call
 from urllib.request import urlopen
 import time
+import pytz
 import datetime
 from shutil import copy2
 from LED import *
@@ -161,12 +162,6 @@ def create_drive_obj():
         # Authenticate if they're not there
         gauth.LocalWebserverAuth()
     elif gauth.access_token_expired:
-        #Get UTC expiration datetime: gauth.credentials.token_expiry
-        #Time remaining in timedelta: diff = datetime.datetime.now()-gauth.credentials.token_expiry
-        #time_remaining = int(diff.total_seconds())
-        #Have to take UTC into account, so : utc=pytz.utc
-        #exp_ts = datetime.datetime.timestamp(utc.localize(gauth.credentials.token_expiry))
-        # Refresh them if expired
         gauth.Refresh()
     else:
         # Initialize the saved creds
@@ -185,6 +180,15 @@ def refresh_drive_obj():
     gauth.Authorize()
     drive = GoogleDrive(gauth)
     return drive
+
+def gdrive_get_expiration_ts(drive):
+    utc = pytz.utc
+    gauth_exp = drive.auth.credentials.token_expiry
+    gauth_exp_utc = utc.localize(gauth_exp)
+    gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
+    now_ts = datetime.datetime.timestamp(datetime.datetime.now())
+    exp_remain = int(gauth_exp_ts - now_ts)
+    return exp_remain
 
 
 def get_filelist(drive, id):
