@@ -79,11 +79,16 @@ if not imgs_available:
     try:
         logging.warning('No imgs found')
         send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
+        telegram_sent = True
         cleanexit(imgs_available,devname,led, formatting = False, succes=True)
         sys.exit()
     #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
     except:
         logging.warning('reached except loop in early-stop call')
+        telegram_sent = False
+    if telegram_sent is True:
+        cleanexit(imgs_available,devname,led, formatting = False, succes=True)
+    else:
         cleanexit(imgs_available,devname,led,formatting = False, succes = False)
     sys.exit()
 
