@@ -344,7 +344,7 @@ def cleanexit(imgs,devname,led, formatting = True, succes=True):
         led.reset()
     if succes:
         led.finish()
-        time.sleep(5)
+        time.sleep(30)
         led.reset()
     else:
         led.error()
