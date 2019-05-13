@@ -80,10 +80,11 @@ class LED(object):
         time.sleep(LED.FAST_CYCLE)
 
     def reset(self):
-        self.__turnledon()
         self.pin_stop.set()
         self.__thread.join()
         GPIO.cleanup()
+        self.__turnledon()
+
 
     ####PRIVATE METHODS: cannot be called like the ones above#####
     #Switching the LED pin on and off:
