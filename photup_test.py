@@ -80,11 +80,11 @@ if not imgs_available:
         logging.warning('No imgs found')
         send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
         cleanexit(imgs_available,devname,led, formatting = False, succes=True)
+        sys.exit()
     #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
     except:
         logging.warning('reached except loop in early-stop call')
         cleanexit(imgs_available,devname,led,formatting = False, succes = False)
-        led.reset()
     sys.exit()
 
 
@@ -284,5 +284,45 @@ logging.warning('Finalized after {} successful uploads of {} image-files'.format
     # led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
     # led_blink = False
     # led_error = True
-led.reset()
 sys.exit()
+
+
+#
+# I'm using a raspberry to automatically upload sets of approximately 1000 images from SD memory to a google drive account. As part of this procedure, a python script gets the Google Drive file list to check whether duplicates may be uploaded. In that case, the local duplicate's name is extended (with (1) or (2) etc.) Since yesterday, the uploading procedure seems to stall after a large number of successful uploads. Upon interrupting the code, it seems the culprit is the line where the total list of google drive files is queried. No errors are returned.
+#
+# This morning, the system was able to upload 917 images before stalling. Afterwards, it stalled after as little as 50 images, and upon a quick reset it even stalled after just handful. It seems like the stalling occurs because of some limit. However, the Google Drive API console shows I'm not hitting those limits (daily max of approx 8k queries, per 100 seconds max at roughly 40, which is both far below the set limits).
+#
+# I've tried to isolate the problem, which pointed me at pydrive's GetList() method. However, it never exits with an error, it just hangs there. When the program runs successfully, it takes approx 5 seconds to receive the listing. When I request the filelist manually (on the rapsberry) I never experience any hanging.
+#
+# ````
+# def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
+#     img_title =  title
+#     no_tries = 0
+#     drive_filenames = []
+#
+#     newimg = drive.CreateFile({
+#         'title':img_title,
+#         "parents": [{
+#             "kind": "drive#childList",
+#             "id": drive_folder_scan_id
+#             }]
+#         })
+#     newimg.SetContentFile(fname)
+#     newimg.Upload()
+#
+#
+#     scanfolder_files = get_filelist(drive,drive_folder_scan_id)
+#     #Continues to check if the file was uploaded etc.
+#
+#
+# def get_filelist(drive, id):
+#     query = "'" + id + "' in parents and trashed=false"
+#     file_list = drive.ListFile({'q': query}).GetList()
+#     return file_list
+# ````
+#
+# `drive` is a pydrive object, based on `GoogleDrive(gauth)` where `gauth` is based on a credentials file and authorized.
+#
+# Full traceback of interrupting the code: https://pastebin.com/CYAc3yY5
+#
+# Anyone a clue what may cause this behavior? Especially the fact that it seems to 'fill up' makes it difficult to cope with.
