@@ -57,7 +57,7 @@ client_id = settings.get('basic_settings','client_id')
 telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
 telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
-version= '0.1'
+version= '0.2'
 backup_folder_location = '/usr/bin/photup/image_backup/'
 logging.warning('Version: {}'.format(version))
 logging.warning('client_id: {0}'.format(client_id))
@@ -261,7 +261,7 @@ except Exception as e:
             time.sleep(60)
             conn_tests += 1
     led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
-    led.blink()
+    led.error()
     sys.exit()
 
 
