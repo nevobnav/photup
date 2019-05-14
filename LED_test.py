@@ -58,16 +58,6 @@ class LED(object):
         self.__turnledoff()
         time.sleep(time_off)
 
-    def finish(self):
-        #Start blinking at the end of a previous cylce, so it doens't interfere
-        self.__ledmode = LED.LED_FINISH
-        intervals = [0.6, 0.1, 0.1]
-        off_int = 0.1
-        for inter in intervals:
-            self.__turnledon()
-            time.sleep(inter)
-            self.__turnledoff()
-            time.sleep(off_int)
 
     def off(self):
         self.__ledmode = LED.LED_OFF
