@@ -349,9 +349,12 @@ def cleanexit(imgs,devname,led, formatting = True, succes=True):
         led.finish()
         time.sleep(30)
         led.reset()
+        logging.warning('Finished with cleanexit and succes')
     else:
         led.error()
         led.reset()
+        logging.warning('Finished with cleanexit and error')
+
 
 
 
