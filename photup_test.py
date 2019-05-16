@@ -246,6 +246,7 @@ try:
     cleanexit(imgs_available,devname,led,formatting = format, succes = True)
 
     logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
+    sys.exit()
 
 
 except Exception as e:
