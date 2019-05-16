@@ -11,7 +11,7 @@ import logging
 import configparser
 
 #### DEBUG SETTINGS
-backup= False
+backup= True
 format= True
 upload = True
 ####################
