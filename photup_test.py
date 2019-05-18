@@ -243,6 +243,7 @@ try:
             logging.warning('Retry connection - attempt no {}'.format(str(conn_tests)))
 
     #Close down session
+    logging.warning('reached cleanexit after succes')
     cleanexit(imgs_available,devname,led,formatting = format, succes = True)
     logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
 
@@ -259,7 +260,7 @@ except Exception as e:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
             conn_tests += 1
-    led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
+    cleanexit(imgs_available,devname,led,formatting = False, succes=False)
     led.error()
     sys.exit()
 

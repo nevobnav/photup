@@ -72,6 +72,7 @@ class LED(object):
     def reset(self):
         self.pin_stop.set()
         self.__thread.join()
+        pin = self.__led_pin
         GPIO.output(pin, GPIO.HIGH)
 
 
