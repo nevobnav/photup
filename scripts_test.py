@@ -346,7 +346,7 @@ def cleanexit(imgs,devname,led, formatting = True, succes=True):
             print("Formatting SD...")
             call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
     if succes:
-        led.on()
+        led.reset()
         logging.warning('Finished with cleanexit and succes')
     else:
         led.error()
