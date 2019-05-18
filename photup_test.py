@@ -244,9 +244,7 @@ try:
 
     #Close down session
     cleanexit(imgs_available,devname,led,formatting = format, succes = True)
-
     logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
-    sys.exit()
 
 
 except Exception as e:
@@ -264,6 +262,10 @@ except Exception as e:
     led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
     led.error()
     sys.exit()
+
+
+logging.warning('Hit EOF')
+
 
 
 #
