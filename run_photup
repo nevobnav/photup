@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python3 /usr/bin/photup/photup_test.py > /usr/bin/photup/photuplog.txt
+python3 /usr/bin/photup/photup.py > /usr/bin/photup/photuplog.txt
 
 #Making sure LED is turned ON after running python script:
 
