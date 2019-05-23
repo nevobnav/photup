@@ -75,7 +75,7 @@ scan_ids = list(set(f['scan_id'] for f in file_dicts))
 if not imgs_available:
     try:
         logging.warning('No imgs found')
-        send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
+        send_telegram('{}: no images found. Exiting'.format(client_id),telegram_ids)
         telegram_sent = True
     #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
     except:
@@ -86,6 +86,8 @@ if not imgs_available:
     else:
         cleanexit(imgs_available,devname,led,formatting = False, succes = False)
     sys.exit()
+else:
+    send_telegram('{}: {} images found ({} mb)'.format(client_id, len(file_dicts), round(total_file_size/1e6)), telegram_ids)
 
 
 if backup:
@@ -243,8 +245,8 @@ try:
             logging.warning('Retry connection - attempt no {}'.format(str(conn_tests)))
 
     #Close down session
+    logging.warning('reached cleanexit after succes')
     cleanexit(imgs_available,devname,led,formatting = format, succes = True)
-
     logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
 
 
@@ -260,47 +262,15 @@ except Exception as e:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
             conn_tests += 1
-    led_thread = cleanexit(imgs_available,devname,led_thread,formatting = False, succes=False)
+    cleanexit(imgs_available,devname,led,formatting = False, succes=False)
     led.error()
     sys.exit()
 
 
-#
-# I'm using a raspberry to automatically upload sets of approximately 1000 images from SD memory to a google drive account. As part of this procedure, a python script gets the Google Drive file list to check whether duplicates may be uploaded. In that case, the local duplicate's name is extended (with (1) or (2) etc.) Since yesterday, the uploading procedure seems to stall after a large number of successful uploads. Upon interrupting the code, it seems the culprit is the line where the total list of google drive files is queried. No errors are returned.
-#
-# This morning, the system was able to upload 917 images before stalling. Afterwards, it stalled after as little as 50 images, and upon a quick reset it even stalled after just handful. It seems like the stalling occurs because of some limit. However, the Google Drive API console shows I'm not hitting those limits (daily max of approx 8k queries, per 100 seconds max at roughly 40, which is both far below the set limits).
-#
-# I've tried to isolate the problem, which pointed me at pydrive's GetList() method. However, it never exits with an error, it just hangs there. When the program runs successfully, it takes approx 5 seconds to receive the listing. When I request the filelist manually (on the rapsberry) I never experience any hanging.
-#
-# ````
-# def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
-#     img_title =  title
-#     no_tries = 0
-#     drive_filenames = []
-#
-#     newimg = drive.CreateFile({
-#         'title':img_title,
-#         "parents": [{
-#             "kind": "drive#childList",
-#             "id": drive_folder_scan_id
-#             }]
-#         })
-#     newimg.SetContentFile(fname)
-#     newimg.Upload()
-#
-#
-#     scanfolder_files = get_filelist(drive,drive_folder_scan_id)
-#     #Continues to check if the file was uploaded etc.
-#
-#
-# def get_filelist(drive, id):
-#     query = "'" + id + "' in parents and trashed=false"
-#     file_list = drive.ListFile({'q': query}).GetList()
-#     return file_list
-# ````
-#
-# `drive` is a pydrive object, based on `GoogleDrive(gauth)` where `gauth` is based on a credentials file and authorized.
-#
-# Full traceback of interrupting the code: https://pastebin.com/CYAc3yY5
-#
-# Anyone a clue what may cause this behavior? Especially the fact that it seems to 'fill up' makes it difficult to cope with.
+logging.warning('Hit EOF')
+
+
+
+#To-Do:
+#Add telegram support to show the total amount of images
+#Show random image from list in telegram (for example images 10 and n-10)

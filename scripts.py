@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import flickrapi
 import pprint
 import os
 import fnmatch
@@ -13,6 +12,7 @@ from subprocess import check_output
 from subprocess import call
 from urllib.request import urlopen
 import time
+import pytz
 import datetime
 from shutil import copy2
 from LED import *
@@ -162,7 +162,6 @@ def create_drive_obj():
         # Authenticate if they're not there
         gauth.LocalWebserverAuth()
     elif gauth.access_token_expired:
-        # Refresh them if expired
         gauth.Refresh()
     else:
         # Initialize the saved creds
@@ -178,13 +177,27 @@ def refresh_drive_obj():
     gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
     gauth.Refresh()
     gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.Authorize()
     drive = GoogleDrive(gauth)
     return drive
+
+def gdrive_get_expiration_ts(drive):
+    utc = pytz.utc
+    gauth_exp = drive.auth.credentials.token_expiry
+    gauth_exp_utc = utc.localize(gauth_exp)
+    gauth_exp_ts = datetime.datetime.timestamp(gauth_exp_utc)
+    now_ts = datetime.datetime.timestamp(datetime.datetime.now())
+    exp_remain = int(gauth_exp_ts - now_ts)
+    return exp_remain
 
 
 def get_filelist(drive, id):
     query = "'" + id + "' in parents and trashed=false"
+    before = datetime.datetime.now() #DEBUG
     file_list = drive.ListFile({'q': query}).GetList()
+    after = datetime.datetime.now() #DEBUG
+    time = round((after - before).total_seconds())
+    logging.warning('Getting filelist in {} seconds'.format(time))
     return file_list
 
 def find_or_create_folder(drive, title, id):
@@ -209,12 +222,17 @@ def prepare_new_scan(drive,client_id,scan_id):
     filenames = [file['title'] for file in scanfolder_files]
     return filenames, folder_scan_id
 
-def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
+def upload_to_gdrive(drive, title, fname, client_id, gdrive_files):
+    drive_folder_scan_id = gdrive_files['drive_folder_scan_id']
+    scanfolder_files = gdrive_files['drive_filenames']
     img_title =  title
     no_tries = 0
-    drive_filenames = []
-    while not(img_title in drive_filenames) and no_tries <10:
-        print("New file: {}".format(img_title))
+    succes = False
+    while no_tries <10 and not(succes):
+        line = "New file: {}, try {}".format(img_title,no_tries)
+        print(line)
+        logging.warning(line)
+
         newimg = drive.CreateFile({
             'title':img_title,
             "parents": [{
@@ -225,17 +243,17 @@ def upload_to_gdrive(drive, title, fname, client_id, drive_folder_scan_id,):
         newimg.SetContentFile(fname)
         try:
             newimg.Upload()
-        except:
+            succes = True
+        except Exception as e:
+            logging.warning('Exception in upload_to_gdrive')
+            logging.warning(e)
             pass
-        scanfolder_files = get_filelist(drive,drive_folder_scan_id)
-        drive_filenames = [file['title'] for file in scanfolder_files]
         no_tries += 1
-    if img_title in drive_filenames:
-        if no_tries == 0:
-            print("{} already in drive".format(img_title))
+    if succes is True:
         return True
     else:
         return False
+
 
 def create_init_file(files,scan_id,client_id,drive_filenames):
     init_file_name = "/usr/bin/photup/init_exit_files/" + client_id + "_" + str(scan_id) + "_init.txt"
@@ -317,7 +335,7 @@ def create_flickr_obj():
     return flickr
 
 
-def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
+def cleanexit(imgs,devname,led, formatting = True, succes=True):
     call(["sudo","umount",devname])
     #Check if there are any images. If not, it may be the wrong usb stick used
     #for dev work. Dont' wanna format that one.
@@ -328,14 +346,13 @@ def cleanexit(imgs,devname,led_thread, formatting = True, succes=True):
             print("Formatting SD...")
             call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
     if succes:
-        stop_led(led_thread)
-        led_succes()
+        led.reset()
+        logging.warning('Finished with cleanexit and succes')
     else:
-        stop_led(led_thread)
-        led_thread = start_error()
-        time.sleep(200)
-        stop_led(led_thread)
-        return led_thread
+        led.error()
+        led.reset()
+        logging.warning('Finished with cleanexit and error')
+
 
 
 
