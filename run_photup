@@ -1,14 +1,4 @@
 #!/bin/bash
 
-python3 /usr/bin/photup/photup.py > /usr/bin/photup/photuplog.txt
-
-#Making sure LED is turned ON after running python script:
-
-if [ ! -d /sys/class/gpio/gpio4 ]
-then
-	echo "4" > /sys/class/gpio/export
-	sleep 0.1;
-fi
-echo "out" > /sys/class/gpio/gpio4/direction
-echo "1" > /sys/class/gpio/gpio4/value
+python3 /usr/bin/photup/photup_test.py > /usr/bin/photup/photuplog.txt
 
