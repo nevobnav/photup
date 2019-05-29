@@ -40,7 +40,6 @@ file_dicts = get_filedicts(backup_folder,extensions,client_id)
 total_file_size = sum([os.path.getsize(f['filepath']) for f in file_dicts])
 imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
-successful_uploads = 0
 
 for scan_id in scan_ids:
     no_of_imgs[scan_id] = 0
