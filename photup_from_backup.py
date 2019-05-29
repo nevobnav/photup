@@ -12,8 +12,8 @@ import configparser
 
 
 #Getting values from USBMOUNT
-backup_folder = "/usr/bin/photup/image_backup/20190416"
-scan_id = "20190416"
+backup_folder = "/usr/bin/photup/image_backup/20190527_v2"
+scan_id = "20190527"
 
 successful_uploads = 0  #Used to count number of succesfull uploads
 utc = pytz.utc
@@ -36,7 +36,7 @@ syslog.syslog('loaded all settings')
 
 
 #Get files from disc
-filedicts = get_filedicts(backup_folder,extensions,client_id)
+file_dicts = get_filedicts(backup_folder,extensions,client_id)
 total_file_size = sum([os.path.getsize(f['filepath']) for f in file_dicts])
 imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
@@ -107,27 +107,3 @@ for scan_id in scan_ids:
         exit_doubles += 1
     resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id])
     send_telegram('{}: finished uploading \n'.format(client_id)+exit_msg,telegram_ids)
-
-
-drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
-start_time = time.time()
-
-drive_filenames, drive_folder_scan_id = prepare_new_scan(drive,client_id,scan_id)
-#Create init and exit txt files with the full list of images (basename only)
-init_file_name = create_init_file(files,scan_id,client_id,drive_filenames)
-
-#Upload initiation file
-resp = upload_to_gdrive(drive, os.path.basename(init_file_name),init_file_name, client_id, drive_folder_scan_id)
-
-for fname in files:
-    extension = os.path.splitext(fname)
-    title = scan_id+'_'+client_id+'_img'+str(successful_uploads+1)+extension[-1]
-    resp = upload_to_gdrive(drive, title,fname, client_id, drive_folder_scan_id)
-    successful_uploads += 1
-    if ((successful_uploads)%100) == 0:
-       print('Renewing drive object')
-       drive = refresh_drive_obj()
-
-end_time = time.time()
-duration = (end_time-start_time)
-resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name, client_id, drive_folder_scan_id)
