@@ -79,7 +79,7 @@ if not imgs_available:
         telegram_sent = True
     #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
     except:
-        logging.warning('reached except loop in early-stop call')
+        logging.warning('reached except loop in early-stop call') #Add exception to warning
         telegram_sent = False
     if telegram_sent is True:
         cleanexit(imgs_available,devname,led, formatting = False, succes=True)
@@ -117,15 +117,6 @@ for scan_id in scan_ids:
     files_per_scan[scan_id] = files
 
 
-
-# ##### DEBUGGING FIX FILE NAMES WIHTOUT BACKUPING ALL IMAGES:
-# xxbase = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img000001.JPG'
-# backup_files = []
-# for x in range(1,2532):
-#     xxfilename = '/usr/bin/photup/image_backup/20190324/20190324_c04_verdegaal_img'+str(x).zfill(6)+'.JPG'
-#     backup_files.append(xxfilename)
-# files = backup_files
-# ########################
 
 
 logging.warning('Starting uploads...')

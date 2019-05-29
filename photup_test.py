@@ -274,3 +274,5 @@ logging.warning('Hit EOF')
 #To-Do:
 #Add telegram support to show the total amount of images
 #Show random image from list in telegram (for example images 10 and n-10)
+#Auto shutdown photup after 24h
+#Check HollandBean daily reboot
