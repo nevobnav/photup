@@ -12,8 +12,9 @@ import configparser
 
 
 #Getting values from USBMOUNT
-backup_folder = "/usr/bin/photup/image_backup/20190527_v2"
-scan_id = "20190527"
+backup_folder = "/usr/bin/photup/image_backup/20190610"
+scan_id = "20190610"
+starting_point = 0
 
 successful_uploads = 0  #Used to count number of succesfull uploads
 utc = pytz.utc
@@ -37,6 +38,10 @@ syslog.syslog('loaded all settings')
 
 #Get files from disc
 file_dicts = get_filedicts(backup_folder,extensions,client_id)
+if starting_point > 0:
+    file_dicts= [x for x in file_dicts if int(x['base_title'].split('.')[0][-5:])>starting_point]
+
+
 total_file_size = sum([os.path.getsize(f['filepath']) for f in file_dicts])
 imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
@@ -52,8 +57,6 @@ for scan_id in scan_ids:
             else:
                 files.append(file_dict['filepath'])
     files_per_scan[scan_id] = files
-
-
 
 
 #Check or wait for connection to establish
