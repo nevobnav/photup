@@ -14,7 +14,7 @@ import configparser
 #Getting values from USBMOUNT
 backup_folder = "/usr/bin/photup/image_backup/20190610"
 scan_id = "20190610"
-starting_point = 0
+starting_point = 0 #Skips images until this point. Use 0 to upload all.
 
 successful_uploads = 0  #Used to count number of succesfull uploads
 utc = pytz.utc
