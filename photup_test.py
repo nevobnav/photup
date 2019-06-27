@@ -198,7 +198,11 @@ try:
                                 successful_uploads[scan_id] += 1
                                 conn_tests = 9999
                             else:
-                                logging.warning('Upload failed, resetting counter and trying again')
+                                logging.warning('Issue uploading title {}, skipping file'.format(title))
+                                try:
+                                    send_telegram('{}: Skipping upload title {} \n'.format(client_id, title),telegram_ids)
+                                except:
+                                    logging.warning('Unable to send telegram')
                                 conn_tests += 1
                     else:
                         logging.warning('Uploading loop failed, resetting counter and trying again')
