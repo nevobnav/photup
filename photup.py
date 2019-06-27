@@ -190,22 +190,26 @@ try:
                     conn_intermediate = test_internet()
                     if conn_intermediate:
                         logging.warning('Connection live')
-                        resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id])
-
-                        if resp is True:
-                            logging.warning('Upload successful')
-                            successful_uploads[scan_id] += 1
-                            conn_tests = 9999
-                        else:
-                            led.error()
-                            logging.warning('Upload failed, resetting counter and trying again')
-                            conn_tests += 1
-                            break
+                        resp = False
+                        while not(resp):
+                            resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id])
+                            if resp is True:
+                                logging.warning('Upload successful')
+                                successful_uploads[scan_id] += 1
+                                conn_tests = 9999
+                            else:
+                                logging.warning('Issue uploading title {}, skipping file'.format(title))
+                                try:
+                                    send_telegram('{}: Skipping upload title {} \n'.format(client_id, title),telegram_ids)
+                                except:
+                                    logging.warning('Unable to send telegram')
+                                conn_tests += 1
+                                time.sleep(30)
                     else:
                         logging.warning('Uploading loop failed, resetting counter and trying again')
                         led.error()
                         conn_tests += 1
-                        break
+                        continue
                 except Exception as e:
                     logging.warning('Failed unkown at file:{}'.format(title))
                     logging.warning('Exception: {}'.format(str(e)))

@@ -193,7 +193,6 @@ try:
                         resp = False
                         while not(resp):
                             resp = upload_to_gdrive(drive,title,file_location, client_id, gdrive_files[scan_id])
-                            resp=False
                             if resp is True:
                                 logging.warning('Upload successful')
                                 successful_uploads[scan_id] += 1
@@ -205,6 +204,7 @@ try:
                                 except:
                                     logging.warning('Unable to send telegram')
                                 conn_tests += 1
+                                time.sleep(30)
                     else:
                         logging.warning('Uploading loop failed, resetting counter and trying again')
                         led.error()
