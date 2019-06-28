@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 import sys
 import syslog
-from scripts import *
+from scripts_test import *
 from shutil import copy2
 from LED import *
 import datetime
