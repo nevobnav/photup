@@ -360,6 +360,7 @@ def get_filedicts(sdcard,extensions,client_id):
     filedicts = []
     counters = {}
     for root, dirs, files in os.walk(sdcard, topdown=False):
+        files.sort()#This is new. Check if it doesn't fuck everything up
         for file in files:
             if file.endswith(tuple(extensions)) and not file.startswith("._") and root.find('Trash') == -1:
                 scan_date = get_img_date(root+"/"+file)
