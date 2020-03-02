@@ -15,7 +15,7 @@ import time
 import pytz
 import datetime
 from shutil import copy2
-from LED import *
+# from LED import *
 import requests
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -154,10 +154,10 @@ def get_now():
     timestamp_string = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     return timestamp_string
 
-def create_drive_obj():
+def create_drive_obj(credentials_file = "/usr/bin/photup/gdrive_creds.txt"):
     gauth = GoogleAuth()
     # Try to load saved client credentials
-    gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.LoadCredentialsFile(credentials_file)
     if gauth.credentials is None:
         # Authenticate if they're not there
         gauth.LocalWebserverAuth()
@@ -167,16 +167,16 @@ def create_drive_obj():
         # Initialize the saved creds
         gauth.Authorize()
     # Save the current credentials to a file
-    gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.SaveCredentialsFile(credentials_file)
 
     drive = GoogleDrive(gauth)
     return drive
 
-def refresh_drive_obj():
+def refresh_drive_obj(credentials_file="/usr/bin/photup/gdrive_creds.txt"):
     gauth = GoogleAuth()
-    gauth.LoadCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.LoadCredentialsFile(credentials_file)
     gauth.Refresh()
-    gauth.SaveCredentialsFile("/usr/bin/photup/gdrive_creds.txt")
+    gauth.SaveCredentialsFile(credentials_file)
     gauth.Authorize()
     drive = GoogleDrive(gauth)
     return drive
