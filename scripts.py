@@ -215,7 +215,7 @@ def find_or_create_folder(drive, title, id):
     return new_id
 
 def prepare_new_scan(drive,client_id,scan_id):
-    folder_Opnames_id = '1DTK46R2aG0cWnN698OGSxGY2dIlJ-LEN'
+    folder_Opnames_id = '1Mz061lPJWr0-PVAdbn17W7a8cjIJyYG6'
     folder_customer_id = find_or_create_folder(drive,client_id,folder_Opnames_id)
     folder_scan_id = find_or_create_folder(drive,scan_id, folder_customer_id)
     scanfolder_files = get_filelist(drive,folder_scan_id)
