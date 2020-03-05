@@ -13,7 +13,6 @@ from subprocess import call
 from urllib.request import urlopen
 import time
 import pytz
-import datetime
 from shutil import copy2
 # from LED import *
 import requests
@@ -375,10 +374,14 @@ def get_filedicts(sdcard,extensions,client_id):
     return filedicts
 
 def get_img_date(filename):
-    image = Image.open(filename)
-    exif = image._getexif()
-    #Exif key for DateTime equals 306
-    dt_str = exif[306]
-    dt_object = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
-    image_date = dt_object.strftime('%Y%m%d')
+    today = datetime.date.today().strftime('%Y%m%d')
+    try:
+        image = Image.open(filename)
+        exif = image._getexif()
+        #Exif key for DateTime equals 306
+        dt_str = exif[306]
+        dt_object = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
+        image_date = dt_object.strftime('%Y%m%d')
+    except:
+        image_date = today
     return(image_date)
