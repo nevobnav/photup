@@ -85,6 +85,13 @@ for file_dict in file_dicts:
     scan_id = file_dict['scan_id']
     no_of_imgs[scan_id] += 1
 
+    #Check file integrity:
+    filesize = os.path.getsize(file_location)
+    if filesize == 0:
+        logging.warning (f'Corrupted file found: {file_location}')
+        send_telegram(f'Corrupted file found: {file_location}',telegram_ids)
+        continue
+
     #Determine file title, add (1) or (2) etc. for duplicate files
     duplicate_counter = 1
     base_title = file_dict['base_title']
