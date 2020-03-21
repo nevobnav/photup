@@ -88,8 +88,8 @@ for file_dict in file_dicts:
     #Check file integrity:
     filesize = os.path.getsize(file_location)
     if filesize == 0:
-        logging.warning (f'Corrupted file found: {file_location}')
-        send_telegram(f'Corrupted file found: {file_location}',telegram_ids)
+        logging.warning ("Corrupted file found: {}".format(file_location))
+        send_telegram("Corrupted file found: {}".format(file_location),telegram_ids)
         continue
 
     #Determine file title, add (1) or (2) etc. for duplicate files
