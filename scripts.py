@@ -298,42 +298,6 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,sca
     return exit_file_name, exit_msg
 
 
-
-def create_flickr_obj():
-    config_file = "/etc/flickr.conf"
-    config = configparser.ConfigParser()
-    try:
-        config.read(config_file)
-        api_key = config.get("main","api_key")
-        api_secret = config.get("main","api_secret")
-        api_token = config.get("main","api_token")
-    except:
-        print("Missing "+config_file)
-        sys.exit(0)
-
-    flickr = flickrapi.FlickrAPI(api_key, api_secret, api_token)
-
-        # Only do this if we don't have a valid token already
-    if not flickr.token_valid(perms='write'):
-        print("Authentication required")
-        # Get a request token
-        flickr.get_request_token(oauth_callback='oob')
-
-        # Open a browser at the authentication URL. Do this however
-        # you want, as long as the user visits that URL.
-        authorize_url = flickr.auth_url(perms='write')
-        print("Open the following URL on your web browser and copy the code to " + config_file)
-        print(authorize_url)
-
-        # Get the verifier code from the user. Do this however you
-        # want, as long as the user gives the application the code.
-        verifier = input('Verifier code: ')
-
-        # Trade the request token for an access token
-        flickr.get_access_token(verifier)
-    return flickr
-
-
 def cleanexit(imgs,devname,led, formatting = True, succes=True):
     call(["sudo","umount",devname])
     #Check if there are any images. If not, it may be the wrong usb stick used
@@ -374,14 +338,14 @@ def get_filedicts(sdcard,extensions,client_id):
     return filedicts
 
 def get_img_date(filename):
-    today = datetime.date.today().strftime('%Y%m%d')
     try:
         image = Image.open(filename)
         exif = image._getexif()
         #Exif key for DateTime equals 306
         dt_str = exif[306]
         dt_object = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
-        image_date = dt_object.strftime('%Y%m%d')
-    except:
-        image_date = today
+    except: #If no exif file can be accessed use creation date of file
+        mtime = os.path.getmtime(filename)
+        dt_object = datetime.datetime.fromtimestamp(mtime).date()
+    image_date = dt_object.strftime('%Y%m%d')
     return(image_date)

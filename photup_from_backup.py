@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 import sys
 import syslog
-from scripts_test import *
+from scripts import *
 from shutil import copy2
 from LED import *
 import datetime
@@ -12,9 +12,9 @@ import configparser
 
 
 #Getting values from USBMOUNT
-backup_folder = "/usr/bin/photup/image_backup/20190625"
-scan_id = "20190625"
-starting_point = 0 #Skips images until this point. Use 0 to upload all.
+backup_folder = "/usr/bin/photup/image_backup/20200321(1)"
+scan_id = "20200321"
+starting_point = 511 #Skips images until this point. Use 0 to upload all.
 
 
 successful_uploads = 0  #Used to count number of succesfull uploads

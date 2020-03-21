@@ -117,8 +117,6 @@ for scan_id in scan_ids:
     files_per_scan[scan_id] = files
 
 
-
-
 logging.warning('Starting uploads...')
 
 #Check or wait for connection to establish
@@ -163,6 +161,13 @@ try:
                         file_location = file_dict['backup_filepath']
                     else:
                         file_location = file_dict['filepath']
+
+                    #Check file integrity:
+                    filesize = os.path.getsize(file_location)
+                    if filesize == 0:
+                        logging.warning (f'Corrupted file found: {file_location}')
+                        send_telegram(f'Corrupted file found: {file_location}',telegram_ids)
+                        continue
 
                     extension = os.path.splitext(file_dict['filename'])[-1]
                     scan_id = file_dict['scan_id']
