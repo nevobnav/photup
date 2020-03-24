@@ -316,9 +316,6 @@ def cleanexit(imgs,devname,led, formatting = True, succes=True):
         led.reset()
         logging.warning('Finished with cleanexit and error')
 
-
-
-
 def get_filedicts(sdcard,extensions,client_id):
     filedicts = []
     counters = {}
@@ -331,11 +328,18 @@ def get_filedicts(sdcard,extensions,client_id):
                     counters[scan_date]+=1
                 else:
                     counters[scan_date] = 1
-                extension = os.path.splitext(file)
-                base_title = scan_date+'_'+client_id+'_img'+str(counters[scan_date]).zfill(6)+extension[-1]
+                extension = os.path.splitext(file)[-1]
+                #Some customers also send multispectral data. This data is of '.tif' or '.TIF' file format and
+                # needs to preserve the original filename, as it indicates what spectral bands is used
+                if extension.lower() != '.jpg':
+                    filename_tif = os.path.splitext(file)[0]
+                    base_title = client_id +'_'+str(counters[scan_date]).zfill(6)+ '_' + filename_tif+extension
+                else:
+                    base_title = scan_date+'_'+client_id+'_img'+str(counters[scan_date]).zfill(6)+extension
                 filedict = {'root':root ,'filepath':root+"/"+file, 'filename':file, 'scan_id':scan_date, 'base_title':base_title}
                 filedicts.append(filedict)
     return filedicts
+
 
 def get_img_date(filename):
     try:

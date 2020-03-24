@@ -65,8 +65,16 @@ logging.warning('Loaded all settings')
 
 
 #Get dictionary with filenames and dates from SD card
-#Dict keys: ['root' ,'filepath', 'filename','scan_id']
-file_dicts = get_filedicts(sdcard,extensions, client_id)        #change this
+#Dict keys:
+    #'root': gives image curent root folder (e.g. '/usr/bin/photup/backup/')
+    #'filepath': gives current full file filepath (e.g. '/usr/bin/photup/backup/img1.jpg')
+    #'filename': gives full filename, without path (e.g. img1.jpg)
+    #'scan_id': gives scan_id string (e.g. '20200101')
+    #'base_title': target filename for saving on gdrive
+
+file_dicts = get_filedicts(sdcard,extensions, client_id)
+
+
 total_file_size = sum([os.path.getsize(f['filepath']) for f in file_dicts])
 imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
