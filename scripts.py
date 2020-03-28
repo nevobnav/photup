@@ -298,7 +298,7 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,sca
     return exit_file_name, exit_msg
 
 
-def cleanexit(imgs,devname,led, formatting = True, succes=True):
+def cleanexit(imgs,devname,led, diskformat, formatting = True, succes=True):
     call(["sudo","umount",devname])
     #Check if there are any images. If not, it may be the wrong usb stick used
     #for dev work. Dont' wanna format that one.
@@ -307,7 +307,10 @@ def cleanexit(imgs,devname,led, formatting = True, succes=True):
         #Format memory sdcard
         if formatting:
             print("Formatting SD...")
-            call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
+            if diskformat == 'exfat':
+                call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
+            if diskformat == 'fat32':
+                call(["sudo","mkfs.fat","-F","32","-n","DJI_IMGS",devname])
     if succes:
         led.reset()
         logging.warning('Finished with cleanexit and succes')

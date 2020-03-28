@@ -97,9 +97,9 @@ if not imgs_available:
         logging.warning('reached except loop in early-stop call') #Add exception to warning
         telegram_sent = False
     if telegram_sent is True:
-        cleanexit(imgs_available,devname,led, formatting = False, succes=True)
+        cleanexit(imgs_available,devname,led,diskformat, formatting = False, succes=True)
     else:
-        cleanexit(imgs_available,devname,led,formatting = False, succes = False)
+        cleanexit(imgs_available,devname,led,diskformat, formatting = False, succes = False)
     sys.exit()
 else:
     send_telegram('{}: {} images found ({} mb)'.format(client_id, len(file_dicts), round(total_file_size/1e6)), telegram_ids)
@@ -261,7 +261,7 @@ try:
 
     #Close down session
     logging.warning('reached cleanexit after succes')
-    cleanexit(imgs_available,devname,led,formatting = format, succes = True)
+    cleanexit(imgs_available,devname,led,diskformat,formatting = format, succes = True)
     logging.warning('Finalized after {} successful uploads of {} image-files'.format(sum(successful_uploads.values()),len(file_dicts)))
 
 
@@ -277,7 +277,7 @@ except Exception as e:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
             conn_tests += 1
-    cleanexit(imgs_available,devname,led,formatting = False, succes=False)
+    cleanexit(imgs_available,devname,led,diskformat,formatting = False, succes=False)
     led.error()
     sys.exit()
 
