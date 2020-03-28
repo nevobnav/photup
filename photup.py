@@ -57,6 +57,10 @@ client_id = settings.get('basic_settings','client_id')
 telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
 telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
+try:
+    diskformat = settings.get('basic_settings','diskformat')
+else:
+    diskformat = 'exfat'
 version= '0.2'
 backup_folder_location = '/usr/bin/photup/image_backup/'
 logging.warning('Version: {}'.format(version))
