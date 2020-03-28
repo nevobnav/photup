@@ -52,6 +52,7 @@ led.blink()
 total_file_size = 0 #Used to determine total file size of all images combined
 minimum_expiration_time = 1800                       #minimum expiration time in seconds for Gdrive (expires in 3600 secs), refresh when reached.
 settings=configparser.ConfigParser()
+logging.warning('Loading user settings: ')
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')
 telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
@@ -59,12 +60,14 @@ telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
 try:
     diskformat = settings.get('basic_settings','diskformat')
-else:
+except:
     diskformat = 'exfat'
 version= '0.2'
 backup_folder_location = '/usr/bin/photup/image_backup/'
 logging.warning('Version: {}'.format(version))
 logging.warning('client_id: {0}'.format(client_id))
+logging.warning('extensions: {}'.format(extensions))
+logging.warning('diskformat: {}'.format(diskformat))
 logging.warning('Loaded all settings')
 
 
