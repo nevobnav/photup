@@ -155,7 +155,7 @@ def send_telegram_photo(img_file,telegramlist):
         img_file: a string containing the full pathname to a photo-type file
         telegramlist: a list of integers representing telegram IDs
     """
-
+    bot=telebot.TeleBot("799284289:AAGQyamXQLC4fPrtePnciwnJc-m8G91YWPk")
     for ID in telegramlist:
         img_file_extension = os.path.splitext(img_file)[-1]
         if img_file_extension.lower() in ['.png','.jpg','.jpeg']:
