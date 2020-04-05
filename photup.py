@@ -149,6 +149,8 @@ try:
             start_time = time.time()
             message_text = "{0}: pictures incoming!".format(client_id)
             send_telegram(message_text,telegram_ids)
+            send_telegram_random_photo(file_dicts, telegram_ids)
+
             drive = create_drive_obj()
             #Refresh just in case current token has a very short lifespan
             drive = refresh_drive_obj()

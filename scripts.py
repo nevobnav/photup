@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 import pprint
 import os
+import random
 import fnmatch
 import re
 import datetime
 import sys
 import logging
 import configparser
-import telepot
+import telebot
 from subprocess import check_output
 from subprocess import call
 from urllib.request import urlopen
@@ -20,7 +21,6 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-
 
 
 def perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids):
@@ -146,8 +146,35 @@ def test_internet(timeout = 5):
 def send_telegram(message_text,telegramlist):
     for ID in telegramlist:
         #Our bot's username is 'VluchtBot', with ID 799284289
-        bot = telepot.Bot('799284289:AAGQyamXQLC4fPrtePnciwnJc-m8G91YWPk')
-        bot.sendMessage(ID, message_text)
+        bot=telebot.TeleBot("799284289:AAGQyamXQLC4fPrtePnciwnJc-m8G91YWPk")
+        bot.send_message(ID, message_text)
+
+def send_telegram_photo(img_file,telegramlist):
+    """
+    Required inputes are:
+        img_file: a string containing the full pathname to a photo-type file
+        telegramlist: a list of integers representing telegram IDs
+    """
+
+    for ID in telegramlist:
+        img_file_extension = os.path.splitext(img_file)[-1]
+        if img_file_extension.lower() in ['.png','.jpg','.jpeg']:
+            with open(img_file, 'rb') as file:
+                bot.send_photo(ID, file)
+        else:
+            bot.send_message(ID,'Error: Not an image file: {}'.format(img_file))
+
+def send_telegram_random_photo(file_dicts, telegram_ids):
+    """
+    Inputs:
+    file_dicts: list containing dicts with file information (from get_file_dicts)
+    telegram_ids: list of integers representing telegram IDs
+    """
+
+    file_dict_index = max(0,round(random.random() * len(file_dicts))-1)
+    random_file_dict = file_dicts[file_dict_index]
+    random_file = random_file_dict['filepath']
+    send_telegram_photo(random_file,telegram_ids)
 
 def get_now():
     timestamp_string = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
@@ -320,6 +347,24 @@ def cleanexit(imgs,devname,led, diskformat, formatting = True, succes=True):
         logging.warning('Finished with cleanexit and error')
 
 def get_filedicts(sdcard,extensions,client_id):
+    """
+    Input:
+    sdcard: string with mount location (e.g. '/media/usb0/')
+    extensions: list of strings with extensions (e.g. ['.jpg','.png'])
+    client_id: string with client_id (e.g. 'c01_robbie')
+
+    Output:
+    filedicts: list of dicts.
+
+    Every dict containing:
+        'root': gives image curent root folder (e.g. '/usr/bin/photup/backup/')
+        'filepath': gives current full file filepath (e.g. '/usr/bin/photup/backup/img1.jpg')
+        'filename': gives full filename, without path (e.g. img1.jpg)
+        'scan_id': gives scan_id string (e.g. '20200101')
+        'base_title': target filename for saving on gdrive
+    """
+
+
     filedicts = []
     counters = {}
     for root, dirs, files in os.walk(sdcard, topdown=False):
