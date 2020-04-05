@@ -325,8 +325,19 @@ def create_exit_file(no_of_imgs,total_file_size, successful_uploads,duration,sca
     return exit_file_name, exit_msg
 
 
-def cleanexit(imgs,devname,led, diskformat, formatting = True, succes=True):
+def cleanexit(imgs,devname,led, formatting = True, succes=True):
+
+    #Check total size of disk to determine diskformat to use (<33gb we do FAT32, otherwise we do exFat)
+    disksize,_,_ = shutil.disk_usage('/media/usb0')
+    disksizeGB = disksize*1e-9
+    if disksizeGB > 33:
+        diskformat = 'exfat'
+    else:
+        diskformat = 'fat32'
+
+    #Unmount disk:
     call(["sudo","umount",devname])
+
     #Check if there are any images. If not, it may be the wrong usb stick used
     #for dev work. Dont' wanna format that one.
     if imgs:
@@ -334,10 +345,17 @@ def cleanexit(imgs,devname,led, diskformat, formatting = True, succes=True):
         #Format memory sdcard
         if formatting:
             print("Formatting SD...")
-            if diskformat == 'exfat':
+            #Format with FAT32 if disk size is below 33GB. This is the case for the Sequoia.
+            #otherwise format using exFat (which is more versatile)
+
+            if diskformat=='exfat':
                 call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
-            if diskformat == 'fat32':
+            elif diskformat == 'fat32':
                 call(["sudo","mkfs.fat","-F","32","-n","DJI_IMGS",devname])
+            else:
+                call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
+            logging.warning('Formated using {}'.format(diskformat))
+
     if succes:
         led.reset()
         logging.warning('Finished with cleanexit and succes')
@@ -345,6 +363,8 @@ def cleanexit(imgs,devname,led, diskformat, formatting = True, succes=True):
         led.error()
         led.reset()
         logging.warning('Finished with cleanexit and error')
+
+
 
 def get_filedicts(sdcard,extensions,client_id):
     """
