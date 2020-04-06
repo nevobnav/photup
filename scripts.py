@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import pprint
+import shutil
 import os
 import random
 import fnmatch
@@ -347,7 +348,6 @@ def cleanexit(imgs,devname,led, formatting = True, succes=True):
             print("Formatting SD...")
             #Format with FAT32 if disk size is below 33GB. This is the case for the Sequoia.
             #otherwise format using exFat (which is more versatile)
-
             if diskformat=='exfat':
                 call(["sudo","mkfs.exfat","-n","DJI_IMGS",devname])
             elif diskformat == 'fat32':
