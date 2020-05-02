@@ -272,7 +272,7 @@ except Exception as e:
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram('{}: {}'.format(client_id,logging.exception(),telegram_ids)
+            send_telegram('{}: {}'.format(client_id,logging.exception()),telegram_ids)
         else:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
