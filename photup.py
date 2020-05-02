@@ -136,8 +136,6 @@ conn_tests = 0
 logging.warning('No. of images found on disc:{}'.format(str(len(file_dicts))))
 
 try:
-    #cause Exception
-    1/0
     while conn_tests<100 and imgs_available and upload:
 
         led.blink()
@@ -267,6 +265,7 @@ try:
 
 except Exception as e:
     logging.warning('Error occured. Broke out of Try-Except around main loop')
+    logging.warning(traceback.format_exc())
     conn = False
     conn_tests = 0
     while conn is False and conn_tests<100:
@@ -283,9 +282,3 @@ except Exception as e:
 
 
 logging.warning('Hit EOF')
-
-try:
-    1/0
-except Exception as error:
-    just_the_string = traceback.format_exc()
-    a = just_the_string
