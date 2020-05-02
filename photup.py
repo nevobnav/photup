@@ -266,14 +266,14 @@ try:
 
 
 except Exception as e:
-    logging.warning('Error occured. Broke out of Try-Except around main loop')
-    logging.warning(logging.exception())
+    message = logging.exception('Error occured. Broke out of Try-Except around main loop')
+    logging.warning(message)
     conn = False
     conn_tests = 0
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram('{}: {}'.format(client_id,str(logging.exception())),telegram_ids)
+            send_telegram('{}: {}'.format(client_id,str(message)),telegram_ids)
         else:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
