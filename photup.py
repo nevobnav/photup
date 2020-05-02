@@ -7,7 +7,7 @@ from shutil import copy2
 from LED import *
 import datetime
 import time
-import logging
+import logging, traceback
 import configparser
 
 #### DEBUG SETTINGS
@@ -266,14 +266,13 @@ try:
 
 
 except Exception as e:
-    message = logging.exception('Error occured. Broke out of Try-Except around main loop')
-    logging.warning(message)
+    logging.warning('Error occured. Broke out of Try-Except around main loop')
     conn = False
     conn_tests = 0
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram('{}: {}'.format(client_id,str(message)),telegram_ids)
+            send_telegram('{}: {}'.format(client_id,traceback.format_exc()),telegram_ids)
         else:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
@@ -284,3 +283,9 @@ except Exception as e:
 
 
 logging.warning('Hit EOF')
+
+try:
+    1/0
+except Exception as error:
+    just_the_string = traceback.format_exc()
+    a = just_the_string
