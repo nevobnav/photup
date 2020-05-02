@@ -137,6 +137,7 @@ logging.warning('No. of images found on disc:{}'.format(str(len(file_dicts))))
 
 try:
     while conn_tests<100 and imgs_available and upload:
+        1/0#Call excpetion
 
         led.blink()
         conn = test_internet()
@@ -265,12 +266,13 @@ try:
 
 except Exception as e:
     logging.warning('Error occured. Broke out of Try-Except around main loop')
+    logging.warning(logging.exception())
     conn = False
     conn_tests = 0
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram('{}: {}'.format(client_id,str(e)),telegram_ids)
+            send_telegram('{}: {}'.format(client_id,logging.exception(),telegram_ids)
         else:
             logging.warning('Cannot send final Telegram - No interwebs')
             time.sleep(60)
