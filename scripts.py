@@ -227,19 +227,26 @@ def get_filelist(drive, id):
     logging.warning('Getting filelist in {} seconds'.format(time))
     return file_list
 
-def find_or_create_folder(drive, title, id):
-    filelist = get_filelist(drive, id)
-    new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
+def find_or_create_folder(drive, target_folder_title, parent_folder_id):
+    filelist = get_filelist(drive, parent_folder_id)
+    #Determine if a new folder needs to be created.
+    new_folder = (next((folder for folder in filelist if folder["title"] == target_folder_title), False))
+    #new_folder is false when a new folder needs to be created
     if not(new_folder):
-        print('Creating new folder "{}"'.format(title))
-        folder_metadata = {'title' : title, 'mimeType' : 'application/vnd.google-apps.folder'}
-        folder_location_metadata = {"parents": [{"kind": "drive#fileLink", "id": id}]}
+        logging.warning('Creating new folder "{}"'.format(target_folder_title))
+        folder_metadata = {'title' : target_folder_title, 'mimeType' : 'application/vnd.google-apps.folder'}
+        folder_location_metadata = {"parents": [{"kind": "drive#fileLink", "id": parent_folder_id}]}
         folder = drive.CreateFile({**folder_metadata, **folder_location_metadata})
         folder.Upload()
-    filelist = get_filelist(drive, id)
-    new_folder = (next((folder for folder in filelist if folder["title"] == title), False))
-    new_id = new_folder['id']
-    return new_id
+        #Introduce sleep here to make sure folder.Upload() is finshed.
+        #If skipped, the new folder might not be fetched in the following
+        #lines.
+        time.sleep(2)
+
+    filelist = get_filelist(drive, parent_folder_id)
+    new_folder = next(folder for folder in filelist if folder["title"] == target_folder_title)
+    target_folder_id = new_folder['id']
+    return target_folder_id
 
 def prepare_new_scan(drive,client_id,scan_id):
     folder_Opnames_id = '1Mz061lPJWr0-PVAdbn17W7a8cjIJyYG6'
