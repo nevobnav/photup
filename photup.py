@@ -36,7 +36,6 @@ while not(conn):
     time.sleep(5)
     conn = test_internet()
 
-
 #Getting values from USBMOUNT
 mountpoint = "/media/usb0"
 devname = get_device_name(mountpoint)
@@ -55,17 +54,20 @@ settings=configparser.ConfigParser()
 logging.warning('Loading user settings: ')
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')
-telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
-telegram_ids = list(map(int,telegram_ids))
+client_name = settings.get('basic_settings','client_name')
+slack_token = settings.get('basic_settings','slack_api_token')
+# telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
+# telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
 
+#Initiate slack integration
+slackchat = SlackChat(slack_token)
 version= '0.2'
 backup_folder_location = '/usr/bin/photup/image_backup/'
 logging.warning('Version: {}'.format(version))
 logging.warning('client_id: {0}'.format(client_id))
 logging.warning('extensions: {}'.format(extensions))
 logging.warning('Loaded all settings')
-
 
 #Get dictionary with filenames and dates from SD card
 #Dict keys:
@@ -77,7 +79,6 @@ logging.warning('Loaded all settings')
 
 file_dicts = get_filedicts(sdcard,extensions, client_id)
 
-
 total_file_size = sum([os.path.getsize(f['filepath']) for f in file_dicts])
 imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
@@ -86,31 +87,32 @@ scan_ids = list(set(f['scan_id'] for f in file_dicts))
 if not imgs_available:
     try:
         logging.warning('No imgs found')
-        send_telegram('client {}: no images found. Exiting'.format(client_id),telegram_ids)
-        telegram_sent = True
-    #Include this except to make sure we exit if connectivity fails and we error on the telegram messaging.
+        slack_resp = slackchat.create_msg('Client *{}*: no images found. Exiting'.format(client_name))
+        slack_sent = slack_response.data['ok']
+    #Include this except to make sure we exit if connectivity fails and we error on the slack messaging.
     except:
-        logging.warning('reached except loop in early-stop call') #Add exception to warning
-        telegram_sent = False
-    if telegram_sent is True:
+        logging.warning('reached except loop when sending initial slack msg') #Add exception to warning
+        slack_sent = False
+    if slack_sent is True:
         cleanexit(imgs_available,devname,led, formatting = False, succes=True)
     else:
         cleanexit(imgs_available,devname,led, formatting = False, succes = False)
     sys.exit()
 else:
-    send_telegram('{}: {} images found ({} mb)'.format(client_id, len(file_dicts), round(total_file_size/1e6)), telegram_ids)
+    slack_resp = slackchat.create_msg('{}: {} images found ({} mb)'.format(
+        client_id, len(file_dicts), round(total_file_size/1e6)))
 
 
 if backup:
     try:
         if test_internet():
-            send_telegram('{}: starting backup.'.format(client_id),telegram_ids)
-        total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids)
+            slackchat.follow_up_msg('{}: starting backup.'.format(client_id))
+        total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location,slackchat)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         file_dicts = updated_file_dicts
     except Exception as e:
         backup = False
-        send_telegram('client {}: perform_backup failed. Please check: {}'.format(client_id,e),telegram_ids)
+        slackchat.follow_up_msg('client {}: perform_backup failed. Please check: {}'.format(client_id,e))
 
 logging.warning('finished backup procedure')
 
@@ -144,8 +146,8 @@ try:
         if conn:
             start_time = time.time()
             message_text = "{0}: pictures incoming!".format(client_id)
-            send_telegram(message_text,telegram_ids)
-            send_telegram_random_photo(file_dicts, telegram_ids)
+            slackchat.follow_up_msg(message_text)
+            slackchat.follow_up_random_img(file_dicts)
 
             drive = create_drive_obj()
             #Refresh just in case current token has a very short lifespan
@@ -179,7 +181,7 @@ try:
                     filesize = os.path.getsize(file_location)
                     if filesize == 0:
                         logging.warning ("Corrupted file found: {}".format(file_location))
-                        send_telegram("Corrupted file found: {}".format(file_location),telegram_ids)
+                        slackchat.follow_up_msg("Corrupted file found: {}".format(file_location))
                         continue
 
                     extension = os.path.splitext(file_dict['filename'])[-1]
@@ -218,9 +220,9 @@ try:
                             else:
                                 logging.warning('Issue uploading title {}, skipping file'.format(title))
                                 try:
-                                    send_telegram('{}: Skipping upload title {} \n'.format(client_id, title),telegram_ids)
+                                    slackchat.follow_up_msg('{}: Skipping upload title {} \n'.format(client_id, title))
                                 except:
-                                    logging.warning('Unable to send telegram')
+                                    logging.warning('Unable to send slack')
                                 conn_tests += 1
                                 time.sleep(30)
                     else:
@@ -248,7 +250,7 @@ try:
                     exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     exit_doubles += 1
                 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id])
-                send_telegram('{}: finished uploading \n'.format(client_id)+exit_msg,telegram_ids)
+                slackchat.follow_up_msg('{}: finished uploading \n'.format(client_id)+exit_msg)
 
         else:
             led.error()
@@ -271,9 +273,9 @@ except Exception as e:
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            send_telegram('{}: {}'.format(client_id,traceback.format_exc()),telegram_ids)
+            slackchat.follow_up_msg('{}: {}'.format(client_id,traceback.format_exc()))
         else:
-            logging.warning('Cannot send final Telegram - No interwebs')
+            logging.warning('Cannot send final Slack - No interwebs')
             time.sleep(60)
             conn_tests += 1
     cleanexit(imgs_available,devname,led,formatting = False, succes=False)

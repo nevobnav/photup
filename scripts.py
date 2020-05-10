@@ -10,6 +10,7 @@ import sys
 import logging
 import configparser
 import telebot
+import slack
 from subprocess import check_output
 from subprocess import call
 from urllib.request import urlopen
@@ -24,7 +25,44 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 
-def perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids):
+class SlackChat(object):
+    channel = 'C013R7YRVDX' #Channel ID for Slack channel #flight-alarm
+
+    #Initializer for new SlackBot message
+    def __init__(self, token):
+        self.token = token
+        self.slack_client = slack.WebClient(token=self.token)       #Initiate clien
+
+    def create_msg(self,message):
+        response = self.slack_client.chat_postMessage(
+            channel = self.channel,
+            text = message)
+        self.thread = response.data['ts']      #Gather thread ID for follow up
+        return response
+
+    def follow_up_msg(self,message):
+        response = self.slack_client.chat_postMessage(
+            channel = self.channel,
+            thread_ts = self.thread,
+            text = message)
+        return response
+
+    def follow_up_img(self,message,img_file_path):
+        response = self.slack_client.files_upload(
+            channels = self.channel,
+            thread_ts = self.thread,
+            title = message,
+            file = img_file_path)
+        return response
+
+    def follow_up_random_img(self,file_dicts):
+    file_dict_index = max(0,round(random.random() * len(file_dicts))-1)
+    random_file_dict = file_dicts[file_dict_index]
+    random_file = random_file_dict['filepath']
+    follow_up_img("Random image from today's upload:",random_file)
+
+
+def perform_backup(file_dicts,client_id,backup_folder_location,slackchat):
     #This function backups up files from SD if space allows. If not it
     # starts deleting backed up files, old to new, untill space is available.
     # If no space is available still, the files are not backed up.
@@ -88,13 +126,13 @@ def perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids):
             os.rmdir(oldest_dir)
             warning_msg = "removed folder {} to make space".format(existing_scans[0])
             logging.warning(warning_msg)
-            send_telegram('{}: '.format(client_id)+warning_msg,telegram_ids)
+            slackchat.follow_up_msg('{}: '.format(client_id)+warning_msg)
             target_stats = os.statvfs(backup_folder_location)
             avail_space = target_stats.f_frsize * target_stats.f_bavail
             existing_scans = os.listdir(backup_folder_location)
             existing_scans.sort()
 
-        #If size is available, copy files. Otherwise don't backup, but let us know via telegram
+        #If size is available, copy files. Otherwise don't backup, but let us know via slack
         if total_file_size < avail_space:
             logging.warning('Enough available space to fit add images to backup drive')
             counter = 1
@@ -114,11 +152,11 @@ def perform_backup(file_dicts,client_id,backup_folder_location,telegram_ids):
         else:
             #This ELSE should be redundant, because of the main IF (before the WHILE)
             logging.warning('Disk full, no backup performed.')
-            send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_ids)
+            slackchat.follow_up_msg('client {}: Disk full - no backup performed.'.format(client_ID))
 
     else:
         logging.warning('Disk full, no backup performed.')
-        send_telegram('client {}: Disk full - no backup performed.'.format(client_ID),telegram_ids)
+        slackchat.follow_up_msg('client {}: Disk full - no backup performed.'.format(client_ID))
 
     return total_file_size_dict, updated_file_dicts
 
@@ -143,39 +181,6 @@ def test_internet(timeout = 5):
         return True
     except:
         return False
-
-def send_telegram(message_text,telegramlist):
-    for ID in telegramlist:
-        #Our bot's username is 'VluchtBot', with ID 799284289
-        bot=telebot.TeleBot("799284289:AAGQyamXQLC4fPrtePnciwnJc-m8G91YWPk")
-        bot.send_message(ID, message_text)
-
-def send_telegram_photo(img_file,telegramlist):
-    """
-    Required inputes are:
-        img_file: a string containing the full pathname to a photo-type file
-        telegramlist: a list of integers representing telegram IDs
-    """
-    bot=telebot.TeleBot("799284289:AAGQyamXQLC4fPrtePnciwnJc-m8G91YWPk")
-    for ID in telegramlist:
-        img_file_extension = os.path.splitext(img_file)[-1]
-        if img_file_extension.lower() in ['.png','.jpg','.jpeg']:
-            with open(img_file, 'rb') as file:
-                bot.send_photo(ID, file)
-        else:
-            bot.send_message(ID,'Error: Not an image file: {}'.format(img_file))
-
-def send_telegram_random_photo(file_dicts, telegram_ids):
-    """
-    Inputs:
-    file_dicts: list containing dicts with file information (from get_file_dicts)
-    telegram_ids: list of integers representing telegram IDs
-    """
-
-    file_dict_index = max(0,round(random.random() * len(file_dicts))-1)
-    random_file_dict = file_dicts[file_dict_index]
-    random_file = random_file_dict['filepath']
-    send_telegram_photo(random_file,telegram_ids)
 
 def get_now():
     timestamp_string = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
