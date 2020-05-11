@@ -54,7 +54,7 @@ class SlackChat(object):
 
         response = self.slack_client.api_call(
             "files.upload",
-            channel=self.channel,
+            channels=self.channel,
             thread_ts = self.thread,
             filename = message,
             file = open(img_file_path,'rb')
