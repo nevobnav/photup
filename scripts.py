@@ -67,6 +67,18 @@ class SlackChat(object):
         random_file = random_file_dict['filepath']
         self.follow_up_img("Random image from today's upload:",random_file)
 
+def check_pi_just_rebooted():
+    os_string = str(check_output('uptime'))
+    #String looks like: 22:22:04 up 9 min,  1 user,  load average: 0.03, 0.07, 0.05
+    #Or more like:  22:15:01 up 17:44,  1 user,  load average: 0.08, 0.03, 0.00
+    #We don't want to run Rpi when it's up 1 min, since it's triggered by a reboot, not a usbmount
+    start = os_string.find('up ') + 3
+    end = start + 5
+    if os_string[start:end] =='0 min' or os_string[start:end]=='1 min':
+        just_rebooted = True
+    else:
+        just_rebooted = False
+    return just_rebooted
 
 def perform_backup(file_dicts,client_id,backup_folder_location,slackchat):
     #This function backups up files from SD if space allows. If not it

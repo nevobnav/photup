@@ -86,12 +86,16 @@ scan_ids = list(set(f['scan_id'] for f in file_dicts))
 #Call an early stop if there are no images on the drive.
 if not imgs_available:
     try:
-        logging.warning('No imgs found')
-        slack_resp = slackchat.create_msg('Client *{}*: no images found. Exiting'.format(client_name))
-        slack_sent = slack_response['ok']
+        just_rebooted = check_pi_just_rebooted()
+        if just_rebooted:
+            logging.warning("Photup triggered by reboot, no action taken")
+        else:
+            logging.warning('No imgs found')
+            slack_resp = slackchat.create_msg('Client *{}*: no images found. Exiting'.format(client_name))
+            slack_sent = slack_response['ok']
     #Include this except to make sure we exit if connectivity fails and we error on the slack messaging.
     except:
-        logging.warning('reached except loop when sending initial slack msg') #Add exception to warning
+        logging.warning('Reached except loop while sending initial slack msg') #Add exception to warning
         slack_sent = False
     if slack_sent is True:
         cleanexit(imgs_available,devname,led, formatting = False, succes=True)
