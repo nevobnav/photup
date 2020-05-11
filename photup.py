@@ -89,6 +89,7 @@ if not imgs_available:
         just_rebooted = check_pi_just_rebooted()
         if just_rebooted:
             logging.warning("Photup triggered by reboot, no action taken")
+            slack_sent=True #Little hack to make sure we go throug the regular exit flow
         else:
             logging.warning('No imgs found')
             slack_resp = slackchat.create_msg('Client *{}*: no images found. Exiting'.format(client_name))
