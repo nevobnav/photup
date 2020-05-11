@@ -65,7 +65,7 @@ class SlackChat(object):
         file_dict_index = max(0,round(random.random() * len(file_dicts))-1)
         random_file_dict = file_dicts[file_dict_index]
         random_file = random_file_dict['filepath']
-        follow_up_img("Random image from today's upload:",random_file)
+        self.follow_up_img("Random image from today's upload:",random_file)
 
 
 def perform_backup(file_dicts,client_id,backup_folder_location,slackchat):
