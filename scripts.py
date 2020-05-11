@@ -44,18 +44,19 @@ class SlackChat(object):
     def follow_up_msg(self,message):
         response = self.slack_client.api_call(
             "chat.postMessage",
-            channel = self.channel,
-            text = message,
-            thread_ts = self.thread)
+            thread_ts = self.thread,
+            text = message)
         return response
 
     def follow_up_img(self,message,img_file_path):
+        #sc.api_call("files.upload",channels=channel,filename='test.jpg',file=open(filepath,'rb'))
+
         response = self.slack_client.api_call(
             "files.upload",
-            channels = self.channel,
             thread_ts = self.thread,
-            title = message,
-            file = img_file_path)
+            filename = message,
+            file = open(img_file_path,'rb')
+            )
         return response
 
     def follow_up_random_img(self,file_dicts):
