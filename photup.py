@@ -88,7 +88,7 @@ if not imgs_available:
     try:
         logging.warning('No imgs found')
         slack_resp = slackchat.create_msg('Client *{}*: no images found. Exiting'.format(client_name))
-        slack_sent = slack_response.data['ok']
+        slack_sent = slack_response['ok']
     #Include this except to make sure we exit if connectivity fails and we error on the slack messaging.
     except:
         logging.warning('reached except loop when sending initial slack msg') #Add exception to warning
@@ -99,20 +99,20 @@ if not imgs_available:
         cleanexit(imgs_available,devname,led, formatting = False, succes = False)
     sys.exit()
 else:
-    slack_resp = slackchat.create_msg('{}: {} images found ({} mb)'.format(
-        client_id, len(file_dicts), round(total_file_size/1e6)))
+    slack_resp = slackchat.create_msg('*Incoming from {}*: {} images found ({} mb)'.format(
+        client_name, len(file_dicts), round(total_file_size/1e6)))
 
 
 if backup:
     try:
         if test_internet():
-            slackchat.follow_up_msg('{}: starting backup.'.format(client_id))
+            slackchat.follow_up_msg('Starting backup...')
         total_file_size_dict, updated_file_dicts = perform_backup(file_dicts,client_id,backup_folder_location,slackchat)
         #Overwrite variable 'files' to start uploading from backup, not from SD
         file_dicts = updated_file_dicts
     except Exception as e:
         backup = False
-        slackchat.follow_up_msg('client {}: perform_backup failed. Please check: {}'.format(client_id,e))
+        slackchat.follow_up_msg('Perform_backup failed. Please check: {}'.format(e))
 
 logging.warning('finished backup procedure')
 
@@ -145,8 +145,7 @@ try:
         logging.warning('Connection before upload: {}'.format(str(conn)))
         if conn:
             start_time = time.time()
-            message_text = "{0}: pictures incoming!".format(client_id)
-            slackchat.follow_up_msg(message_text)
+            slackchat.follow_up_msg("Upload started...")
             slackchat.follow_up_random_img(file_dicts)
 
             drive = create_drive_obj()
@@ -220,7 +219,7 @@ try:
                             else:
                                 logging.warning('Issue uploading title {}, skipping file'.format(title))
                                 try:
-                                    slackchat.follow_up_msg('{}: Skipping upload title {} \n'.format(client_id, title))
+                                    slackchat.follow_up_msg('Issue uploading title {}, skipping it...'.format(title))
                                 except:
                                     logging.warning('Unable to send slack')
                                 conn_tests += 1
@@ -250,7 +249,7 @@ try:
                     exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
                     exit_doubles += 1
                 resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id])
-                slackchat.follow_up_msg('{}: finished uploading \n'.format(client_id)+exit_msg)
+                slackchat.follow_up_msg('Finished uploading \n'+exit_msg)
 
         else:
             led.error()
@@ -273,7 +272,7 @@ except Exception as e:
     while conn is False and conn_tests<100:
         conn = test_internet()
         if conn:
-            slackchat.follow_up_msg('{}: {}'.format(client_id,traceback.format_exc()))
+            slackchat.follow_up_msg('Error: {}'.format(traceback.format_exc()))
         else:
             logging.warning('Cannot send final Slack - No interwebs')
             time.sleep(60)
