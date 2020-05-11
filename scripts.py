@@ -10,7 +10,7 @@ import sys
 import logging
 import configparser
 import telebot
-import slack
+import slackclient
 from subprocess import check_output
 from subprocess import call
 from urllib.request import urlopen
@@ -31,24 +31,27 @@ class SlackChat(object):
     #Initializer for new SlackBot message
     def __init__(self, token):
         self.token = token
-        self.slack_client = slack.WebClient(token=self.token)       #Initiate clien
+        self.slack_client = slackclient.SlackClient(token=self.token)       #Initiate clien
 
     def create_msg(self,message):
-        response = self.slack_client.chat_postMessage(
-            channel = self.channel,
-            text = message)
-        self.thread = response.data['ts']      #Gather thread ID for follow up
+        response = self.slack_client.api_call(
+            "chat.postMessage",
+            channel=self.channel,
+            text=message)
+        self.thread = response['ts']        #Gather thread ID for follow up
         return response
 
     def follow_up_msg(self,message):
-        response = self.slack_client.chat_postMessage(
+        response = self.slack_client.api_call(
+            "chat.postMessage",
             channel = self.channel,
-            thread_ts = self.thread,
-            text = message)
+            text = message,
+            thread_ts = self.thread)
         return response
 
     def follow_up_img(self,message,img_file_path):
-        response = self.slack_client.files_upload(
+        response = self.slack_client.api_call(
+            "files.upload",
             channels = self.channel,
             thread_ts = self.thread,
             title = message,
