@@ -10,7 +10,6 @@ import sys
 import logging
 import configparser
 import telebot
-import slackclient
 from subprocess import check_output
 from subprocess import call
 from urllib.request import urlopen
@@ -26,6 +25,8 @@ from pydrive.drive import GoogleDrive
 
 
 class SlackChat(object):
+    import slackclient
+    import crazybazy
     channel = 'C013R7YRVDX' #Channel ID for Slack channel #flight-alarm
 
     #Initializer for new SlackBot message

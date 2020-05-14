@@ -12,9 +12,9 @@ import configparser
 
 
 #Getting values from USBMOUNT
-backup_folder = "/usr/bin/photup/image_backup/20200321(1)"
-scan_id = "20200321"
-starting_point = 511 #Skips images until this point. Use 0 to upload all.
+backup_folder = "/usr/bin/photup/image_backup/20200513"
+scan_id = "20200513"
+starting_point = 449 #Skips images until this point. Use 0 to upload all.
 
 
 successful_uploads = 0  #Used to count number of succesfull uploads
@@ -30,8 +30,6 @@ minimum_expiration_time = 1800                       #minimum expiration time in
 settings=configparser.ConfigParser()
 settings.read('/usr/bin/photup/photup_conf')
 client_id = settings.get('basic_settings','client_id')
-telegram_ids = settings.get('basic_settings','telegram_id').splitlines()
-telegram_ids = list(map(int,telegram_ids))
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
 version= '0.1'
 syslog.syslog('loaded all settings')
@@ -89,7 +87,6 @@ for file_dict in file_dicts:
     filesize = os.path.getsize(file_location)
     if filesize == 0:
         logging.warning ("Corrupted file found: {}".format(file_location))
-        send_telegram("Corrupted file found: {}".format(file_location),telegram_ids)
         continue
 
     #Determine file title, add (1) or (2) etc. for duplicate files
@@ -116,4 +113,3 @@ for scan_id in scan_ids:
         exit_file_name = exit_file_name_base[:-4]+'({})'.format(init_doubles) + '.txt'
         exit_doubles += 1
     resp = upload_to_gdrive(drive, os.path.basename(exit_file_name),exit_file_name_base, client_id, gdrive_files[scan_id])
-    send_telegram('{}: finished uploading \n'.format(client_id)+exit_msg,telegram_ids)
