@@ -33,10 +33,12 @@ client_id = settings.get('basic_settings','client_id')
 extensions = settings.get('basic_settings','extensions').splitlines()	#Only these files are transfered (case SENSITIVE)
 version= '0.1'
 syslog.syslog('loaded all settings')
-
+print('loaded all settings')
 
 #Get files from disc
 file_dicts = get_filedicts(backup_folder,extensions,client_id)
+print('fetched all file dicts')
+
 if starting_point > 0:
     file_dicts= [x for x in file_dicts if int(x['base_title'].split('.')[0][-5:])>starting_point]
 
@@ -46,8 +48,8 @@ imgs_available = len(file_dicts)>0
 scan_ids = list(set(f['scan_id'] for f in file_dicts))
 
 for scan_id in scan_ids:
-    no_of_imgs[scan_id] = 0
-    successful_uploads[scan_id] = 0
+    no_of_imgs[scan_id] = 1
+    successful_uploads[scan_id] = 1
     files = []
     for file_dict in file_dicts:
         if file_dict['scan_id'] == scan_id:
