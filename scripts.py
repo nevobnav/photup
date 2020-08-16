@@ -9,6 +9,7 @@ import datetime
 import sys
 import logging
 import configparser
+import filecmp
 import slackclient
 from subprocess import check_output
 from subprocess import call
@@ -102,6 +103,24 @@ def perform_backup(file_dicts,client_id,backup_folder_location,slackchat):
         duplicate_counter = 1
         backup_folder_base = backup_folder_location+scan_id+'/'
         backup_folder = backup_folder_base
+
+        #Check if it's new data, or if we backed up before:
+        if os.path.exists(backup_folder):
+            files_already_in_backup = [f for f in os.listdir(backup_folder) if f.endswith('.JPG')]
+            filepaths_already_in_backup = [os.path.join(backup_folder,f) for f in files_already_in_backup]
+            filepaths_in_scan = [f for f in file_dicts if f['scan_id']==scan_id]
+
+            #Filesize per image is quasi-unique, so comparing sum of image file
+            #sizes is a valid way to check if we're dealing with the same images
+
+            fs_in_backup = sum([os.path.getsize(f) for f in filepaths_already_in_backup])
+            fs_in_scan = sum([os.path.getsize(f['filepath']) for f in filepaths_in_scan])
+
+            if fs_in_backup == fs_in_scan:
+                #skip this entire scan for backing up, notify on slack
+                slackchat.follow_up_msg('{}: Scan {} already found in backup folder. Prevented double backup'.format(client_id,scan_id))
+                continue    #Skip the rest of the loop for this scan
+
         while os.path.exists(backup_folder):
             backup_folder = backup_folder_base[0:-1]+'({})/'.format(duplicate_counter)
             duplicate_counter +=1
